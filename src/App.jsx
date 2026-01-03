@@ -1,14 +1,13 @@
-import { useState } from 'react'
-import { Button } from "@/components/ui/button"
+import { Banner } from './components/Banner'
+import { About } from './components/About'
+import { Nav } from './components/Nav'
 
 function App() {
-  const [count, setCount] = useState(0)
-
   return (
     <>
-      <div className="flex min-h-svh flex-col items-center justify-center">
-        <Button>Click me</Button>
-      </div>
+      <Nav />
+      <Banner />
+      <About />
     </>
   )
 }
