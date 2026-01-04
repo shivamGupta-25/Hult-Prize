@@ -5,7 +5,7 @@ const contactData = {
 
   organization: "Hult Prize - Hansraj College",
 
-  googleMapsUrl: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3501.1234567890123!2d77.2089!3d28.7041!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x390d03c34e1253b3%3A0x6b5f192123456789!2sHansraj%20College%2C%20University%20of%20Delhi!5e0!3m2!1sen!2sin!4v1234567890123!5m2!1sen!2sin",
+  googleMapsUrl: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3500.3495689944693!2d77.20724107433172!3d28.67918797563931!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x390cfd9a74a2aacf%3A0x59e09f11f71c1a54!2sHansraj%20College!5e0!3m2!1sen!2sin!4v1767558622358!5m2!1sen!2sin",
 
   contactInfo: {
     email: "hultprizehansraj@gmail.com",

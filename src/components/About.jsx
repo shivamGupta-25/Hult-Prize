@@ -116,7 +116,7 @@ export const About = () => {
                     aria-hidden="true"
                   />
                   <blockquote className="text-sm sm:text-base md:text-lg lg:text-xl leading-relaxed text-foreground font-medium pl-3 sm:pl-4 md:pl-6">
-                    <p className="relative">
+                    <p className="relative text-justify">
                       <span
                         className="absolute -left-1 sm:-left-2 -top-1 text-3xl sm:text-4xl md:text-5xl font-bold text-primary/20 leading-none"
                         aria-hidden="true"
