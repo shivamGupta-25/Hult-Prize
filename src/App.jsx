@@ -3,6 +3,7 @@ import { About } from './components/About'
 import { Nav } from './components/Nav'
 import { Motto } from './components/Motto'
 import Contact from './components/ContactUs'
+import Footer from './components/Footer'
 
 function App() {
   return (
@@ -12,6 +13,7 @@ function App() {
       <Motto />
       <About />
       <Contact />
+      <Footer />
     </>
   )
 }

@@ -2,6 +2,7 @@ import contactData from '@/Data/Contact'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Mail, Phone, MapPin, Clock, Linkedin, Instagram, Twitter, Facebook } from 'lucide-react'
 import { Separator } from '@/components/ui/separator'
+import { sanitizePhone, formatAddress } from '@/lib/contactUtils'
 
 // Icon mapping for social links
 const iconMap = {
@@ -9,11 +10,6 @@ const iconMap = {
   Instagram,
   Twitter,
   Facebook
-}
-
-const sanitizePhone = (phone) => {
-  if (!phone) return ''
-  return phone.replace(/[\s\-()]/g, '')
 }
 
 export default function Contact() {
@@ -32,21 +28,7 @@ export default function Contact() {
     address
   } = contactInfo || {}
 
-  const formatAddress = () => {
-    if (!address) return null
-    const parts = []
-    if (address.line1) parts.push(address.line1)
-    if (address.line2) parts.push(address.line2)
-    if (address.city) {
-      const cityPart = address.pincode
-        ? `${address.city} - ${address.pincode}`
-        : address.city
-      parts.push(cityPart)
-    }
-    return parts.length > 0 ? parts : []
-  }
-
-  const addressLines = formatAddress()
+  const addressLines = formatAddress(address)
 
   return (
     <div className="min-h-screen bg-background py-12 px-4 sm:px-6 lg:px-8">
