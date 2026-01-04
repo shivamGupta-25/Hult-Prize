@@ -9,8 +9,8 @@ function App() {
     <>
       <Nav />
       <Banner />
-      <About />
       <Motto />
+      <About />
       <Contact />
     </>
   )

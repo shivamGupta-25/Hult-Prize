@@ -1,6 +1,7 @@
 import contactData from '@/Data/Contact'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Mail, Phone, MapPin, Clock, Linkedin, Instagram, Twitter, Facebook } from 'lucide-react'
+import { Separator } from '@/components/ui/separator'
 
 // Icon mapping for social links
 const iconMap = {
@@ -54,7 +55,7 @@ export default function Contact() {
         {(title || description) && (
           <div className="text-center mb-12">
             {title && (
-              <h1 className="text-4xl md:text-5xl font-bold text-primary mb-4">
+              <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-4">
                 {title}
               </h1>
             )}
@@ -63,6 +64,7 @@ export default function Contact() {
                 {description}
               </p>
             )}
+            <Separator className="w-24 mx-auto bg-primary/30 mt-3" />
           </div>
         )}
 

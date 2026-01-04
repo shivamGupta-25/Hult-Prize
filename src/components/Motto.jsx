@@ -1,5 +1,5 @@
 import React from 'react'
-import mottoData from '@/Data/SiteData'
+import { mottoData } from "@/Data/SiteData";
 import { Card, CardContent } from '@/components/ui/card'
 
 export const Motto = () => {
