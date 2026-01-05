@@ -25,7 +25,7 @@ export const Teams = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background py-8 px-4 sm:py-12 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-background py-6 px-4 sm:py-8 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto space-y-8 sm:space-y-12">
 
         {/* Header */}
@@ -165,7 +165,7 @@ export const Teams = () => {
                                 key={hIdx}
                                 className="flex items-center space-x-3 bg-muted/30 p-3 sm:p-4 rounded-xl border border-border/50 hover:border-primary/50 transition-colors"
                               >
-                                <Avatar className="h-10 w-10 sm:h-12 sm:w-12 border-2 border-primary flex-shrink-0">
+                                <Avatar className="h-10 w-10 sm:h-12 sm:w-12 border-2 border-primary shrink-0">
                                   <AvatarFallback className="bg-primary/10 text-primary font-bold text-sm">
                                     {getInitials(head.name)}
                                   </AvatarFallback>
@@ -185,7 +185,7 @@ export const Teams = () => {
                                 key={`snr-${sIdx}`}
                                 className="flex items-center space-x-3 bg-muted/30 p-3 sm:p-4 rounded-xl border border-border/50 hover:border-primary/50 transition-colors"
                               >
-                                <Avatar className="h-9 w-9 sm:h-10 sm:w-10 flex-shrink-0">
+                                <Avatar className="h-9 w-9 sm:h-10 sm:w-10 shrink-0">
                                   <AvatarFallback className="bg-muted text-muted-foreground font-medium text-sm">
                                     {getInitials(member.name)}
                                   </AvatarFallback>
