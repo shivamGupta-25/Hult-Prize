@@ -1,173 +1,182 @@
 const TeamData = {
   "2025-26": {
     academicYear: "2025-26",
+
     council: {
       coreTeam: [
-        { name: "Yash Gupta", role: "Campus Director", image: "/Council/YashGupta.jpg", linkedin: null },
-        { name: "Mahak Poswal", role: "President", image: "/Council/MahakPoswal.jpg", linkedin: null },
-        { name: "Hrishikesh Tamuli", role: "Vice President", image: "/Council/HrishikeshTamuli.jpg", linkedin: null },
-        { name: "Merryl Biju", role: "General Secretary", image: "/Council/Merryl.jpg", linkedin: null },
-        { name: "Ayushman Dubey", role: "Joint Secretary", image: "/Council/Ayushman.jpg", linkedin: null }
+        { name: "Yash Gupta", role: "Campus Director", image: "/Council/2025-26/YashGupta.jpg", linkedin: "https://www.linkedin.com/in/yash-gupta-1234567890/", mail: "yashgupta@hultprize.org" },
+        { name: "Mahak Poswal", role: "President", image: "/Council/2025-26/MahakPoswal.jpg", linkedin: null },
+        { name: "Hrishikesh Tamuli", role: "Vice President", image: "/Council/2025-26/HrishikeshTamuli.jpg", linkedin: null },
+        { name: "Merryl Biju", role: "General Secretary", image: "/Council/2025-26/Merryl.jpg", linkedin: null },
+        { name: "Ayushman Dubey", role: "Joint Secretary", image: "/Council/2025-26/Ayushman.jpg", linkedin: null }
       ],
 
-      heads: {
-        Editorial: ["Anushka", "Sneha"],
-        Technical: ["Vivek", "Prince"],
-        Sponsorship: ["Vaibhavi", "Khushi", "Om"],
-        EventManagement: ["Jannat", "Uttkarsh"],
-        Marketing: ["Tanishka", "Rohit"],
-        Projects: ["Aman", "Chirag", "Bhavya"]
-      },
+      advisory: [],
 
-      seniorMembers: {
-        Technical: ["Yug", "Kritika"],
-        Sponsorship: ["Ravi", "Purba"],
-        EventManagement: ["Aastha"],
-        Marketing: ["Krishna", "Sanjeevni"]
+      departments: {
+        Editorial: {
+          heads: [{ name: "Anushka" }, { name: "Sneha" }],
+          seniorMembers: [],
+          members: []
+        },
+
+        Technical: {
+          heads: [{ name: "Vivek" }, { name: "Prince" }],
+          seniorMembers: [{ name: "Yug" }, { name: "Kritika" }],
+          members: []
+        },
+
+        Sponsorship: {
+          heads: [{ name: "Vaibhavi" }, { name: "Khushi" }, { name: "Om" }],
+          seniorMembers: [{ name: "Ravi" }, { name: "Purba" }],
+          members: []
+        },
+
+        EventManagement: {
+          heads: [{ name: "Jannat" }, { name: "Uttkarsh" }],
+          seniorMembers: [{ name: "Aastha" }],
+          members: []
+        },
+
+        Marketing: {
+          heads: [{ name: "Tanishka" }, { name: "Rohit" }],
+          seniorMembers: [{ name: "Krishna" }, { name: "Sanjeevni" }],
+          members: []
+        },
+
+        Projects: {
+          heads: [{ name: "Aman" }, { name: "Chirag" }, { name: "Bhavya" }],
+          seniorMembers: [],
+          members: []
+        }
       }
     }
   },
 
   "2024-25": {
     academicYear: "2024-25",
+
     council: {
       coreTeam: [
-        { name: "Ruby", role: "Campus Director & President", image: "/Council/Ruby.jpg", linkedin: null },
-        { name: "Garv Jain", role: "Vice President", image: "/Council/GarvJain.jpg", linkedin: null },
-        { name: "Tuba Khan", role: "Vice President", image: "/Council/TubaKhan.jpg", linkedin: null },
-        { name: "Aditi Rawat", role: "General Secretary", image: "/Council/AditiRawat.jpg", linkedin: null },
-        { name: "Dhruv Jain", role: "Joint Secretary", image: "/Council/DhruvJain.jpg", linkedin: null }
+        { name: "Ruby", role: "Campus Director & President", image: "/Council/2024-25/Ruby.jpg", linkedin: null },
+        { name: "Garv Jain", role: "Vice President", image: "/Council/2024-25/GravJain.jpg", linkedin: null },
+        { name: "Tuba Khan", role: "Vice President", image: "/Council/2024-25/TubaKhan.jpg", linkedin: null },
+        { name: "Aditi Rawat", role: "General Secretary", image: "/Council/2024-25/AditiRawat.jpg", linkedin: null },
+        { name: "Dhruv Jain", role: "Joint Secretary", image: "/Council/2024-25/DhruvJain.jpg", linkedin: null }
       ],
 
-      chiefCoordinators: ["Mahak Poswal", "Yash Gupta"],
+      advisory: [{ name: "Mahak Poswal" }, { name: "Yash Gupta" }],
 
-      heads: {
-        Editorial: ["Merryl", "Ayushman Dubey"],
-        Technical: ["Kumari Janawi", "Ankit", "Hrishikesh Tamuli"],
-        Sponsorship: ["Himanshi Batra", "Shruti"],
-        EventManagementAndMarketing: [
-          "Siddheshwar Mishra",
-          "Jatin Kumar",
-          "Priyam Singh"
-        ]
-      },
+      departments: {
+        Editorial: {
+          heads: [{ name: "Merryl" }, { name: "Ayushman Dubey" }],
+          seniorMembers: [
+            { name: "Naman Kalirona" },
+            { name: "Mansha Guglani" },
+            { name: "Rishu Charasia" },
+            { name: "Mahima Karki" },
+            { name: "Akhil Kushwaha" }
+          ],
+          members: [
+            { name: "Mayank Gangwar" },
+            { name: "Nikita Agrawal" },
+            { name: "Anushka Tiwari" },
+            { name: "Sajal Saurav" },
+            { name: "Jahanvi Grover" },
+            { name: "Juhi Kumari" },
+            { name: "Kavya Sharma" }
+          ]
+        },
 
-      seniorMembers: {
-        Editorial: [
-          "Naman Kalirona",
-          "Mansha Guglani",
-          "Rishu Charasia",
-          "Mahima Karki",
-          "Akhil Kushwaha"
-        ],
-        Technical: ["Jyoti Kumari", "Dev Mehra", "Misha"],
-        Sponsorship: ["Mohd. Irfan", "Arushi Bajpay", "Ayush Mahato"],
-        EventManagementAndMarketing: ["Ayush Aman"]
-      },
+        Technical: {
+          heads: [{ name: "Kumari Janawi" }, { name: "Ankit" }, { name: "Hrishikesh Tamuli" }],
+          seniorMembers: [{ name: "Jyoti Kumari" }, { name: "Dev Mehra" }, { name: "Misha" }],
+          members: [
+            { name: "Khushboo Kansal" },
+            { name: "Soumyansh" },
+            { name: "Bhumika Garg" },
+            { name: "Vivek Kumar" },
+            { name: "Ankit Marandi" },
+            { name: "Jannat" },
+            { name: "Hareen Kaur" },
+            { name: "Jashit Somani" }
+          ]
+        },
 
-      members: {
-        Editorial: [
-          "Mayank Gangwar",
-          "Nikita Agrawal",
-          "Anushka Tiwari",
-          "Sajal Saurav",
-          "Jahanvi Grover",
-          "Juhi Kumari",
-          "Kavya Sharma"
-        ],
-        Technical: [
-          "Khushboo Kansal",
-          "Soumyansh",
-          "Bhumika Garg",
-          "Vivek Kumar",
-          "Ankit Marandi",
-          "Jannat",
-          "Hareen Kaur",
-          "Jashit Somani"
-        ],
-        Sponsorship: [
-          "Somesh Pal",
-          "Diya Aneesh",
-          "Neharika",
-          "Khushi",
-          "Ritika Surekh",
-          "Uttkarsh Agarwal",
-          "Rajsi Kaur",
-          "Dharav",
-          "Om Prakash Sahu",
-          "Aryan Gupta",
-          "Alok Sonowal"
-        ],
-        EventManagementAndMarketing: [
-          "Angela Arora",
-          "Krishna Tayal",
-          "Priyanshi Agrawal",
-          "Kritika Sharma",
-          "Rajat Soni",
-          "Palak",
-          "Vaibhav Awasthi",
-          "Kanishka Saini"
-        ]
+        Sponsorship: {
+          heads: [{ name: "Himanshi Batra" }, { name: "Shruti" }],
+          seniorMembers: [{ name: "Mohd. Irfan" }, { name: "Arushi Bajpay" }, { name: "Ayush Mahato" }],
+          members: [
+            { name: "Somesh Pal" },
+            { name: "Diya Aneesh" },
+            { name: "Neharika" },
+            { name: "Khushi" },
+            { name: "Ritika Surekh" },
+            { name: "Uttkarsh Agarwal" },
+            { name: "Rajsi Kaur" },
+            { name: "Dharav" },
+            { name: "Om Prakash Sahu" },
+            { name: "Aryan Gupta" },
+            { name: "Alok Sonowal" }
+          ]
+        },
+
+        EventManagementAndMarketing: {
+          heads: [{ name: "Siddheshwar Mishra" }, { name: "Jatin Kumar" }, { name: "Priyam Singh" }],
+          seniorMembers: [{ name: "Ayush Aman" }],
+          members: [
+            { name: "Angela Arora" },
+            { name: "Krishna Tayal" },
+            { name: "Priyanshi Agrawal" },
+            { name: "Kritika Sharma" },
+            { name: "Rajat Soni" },
+            { name: "Palak" },
+            { name: "Vaibhav Awasthi" },
+            { name: "Kanishka Saini" }
+          ]
+        }
       }
     }
   },
 
   "2023-24": {
     academicYear: "2023-24",
+
     council: {
       coreTeam: [
-        { name: "Vartika Verma", role: "Campus Director & President", image: "/Council/Vartika.jpg", linkedin: null },
-        { name: "Vishnupriya Saxena", role: "Vice President", image: "/Council/Vishnupriya.jpg", linkedin: null },
-        { name: "Tanuj Kaushik", role: "General Secretary", image: "/Council/Tanuj.jpg", linkedin: null },
-        { name: "Jiyansh", role: "Joint Secretary", image: "/Council/Jiyansh.jpg", linkedin: null }
+        { name: "Vartika Verma", role: "Campus Director & President", image: "/Council/2023-24/Vartika.jpg", linkedin: null },
+        { name: "Vishnupriya Saxena", role: "Vice President", image: "/Council/2023-24/Vishnupriya.jpg", linkedin: null },
+        { name: "Tanuj Kaushik", role: "General Secretary", image: "/Council/2023-24/Tanuj.jpg", linkedin: null },
+        { name: "Jiyansh", role: "Joint Secretary", image: "/Council/2023-24/Jiyansh.jpg", linkedin: null }
       ],
 
       advisory: [
-        "Kajal Jangra",
-        "Ridham Singla",
-        "Sanya Jain"
+        { name: "Kajal Jangra" },
+        { name: "Ridham Singla" },
+        { name: "Sanya Jain" }
       ],
 
-      heads: [
-        "Aditi Rawat",
-        "Anant Gupta",
-        "Arti Kumari",
-        "Astik Agrawal",
-        "Dhruv Jain",
-        "Garv Jain",
-        "Harsh Kumar",
-        "Jaagrit Dhawan",
-        "Mohit Kumar",
-        "Piyush Setia",
-        "Ruby",
-        "Sushrut Bhadani",
-        "Tanish Sharma",
-        "Tuba Khan",
-        "Tushar Sharma"
-      ],
-
-      members: [
-        "Adhya Manocha",
-        "Ankit",
-        "Aryaman Pranav",
-        "Ayushman Dubey",
-        "Aaditya Khairwal",
-        "Chitrakshi",
-        "Havya Bhatia",
-        "Khushi Satwani",
-        "Krish Grover",
-        "Kumari Janawi",
-        "Mahak Poswal",
-        "Manya Singhal",
-        "Merryl Biju",
-        "Parul",
-        "Ritansh",
-        "Sai Kartikeya",
-        "Sania Khan",
-        "Shashwat Sharda",
-        "Vaibhav",
-        "Yash Gupta"
-      ]
+      departments: {
+        General: {
+          heads: [
+            { name: "Aditi Rawat" }, { name: "Anant Gupta" }, { name: "Arti Kumari" },
+            { name: "Astik Agrawal" }, { name: "Dhruv Jain" }, { name: "Garv Jain" },
+            { name: "Harsh Kumar" }, { name: "Jaagrit Dhawan" }, { name: "Mohit Kumar" },
+            { name: "Piyush Setia" }, { name: "Ruby" }, { name: "Sushrut Bhadani" },
+            { name: "Tanish Sharma" }, { name: "Tuba Khan" }, { name: "Tushar Sharma" }
+          ],
+          seniorMembers: [],
+          members: [
+            { name: "Adhya Manocha" }, { name: "Ankit" }, { name: "Aryaman Pranav" },
+            { name: "Ayushman Dubey" }, { name: "Aaditya Khairwal" }, { name: "Chitrakshi" },
+            { name: "Havya Bhatia" }, { name: "Khushi Satwani" }, { name: "Krish Grover" },
+            { name: "Kumari Janawi" }, { name: "Mahak Poswal" }, { name: "Manya Singhal" },
+            { name: "Merryl Biju" }, { name: "Parul" }, { name: "Ritansh" },
+            { name: "Sai Kartikeya" }, { name: "Sania Khan" }, { name: "Shashwat Sharda" },
+            { name: "Vaibhav" }, { name: "Yash Gupta" }
+          ]
+        }
+      }
     }
   }
 };
