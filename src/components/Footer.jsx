@@ -2,6 +2,7 @@ import { Separator } from "@/components/ui/separator";
 import contactData from "@/Data/Contact";
 import { Mail, Phone, MapPin, Linkedin, Instagram } from "lucide-react";
 import { sanitizePhone, formatAddressString, useDeveloperInfo } from "@/lib/contactUtils";
+import { Link } from "react-router-dom";
 
 // Icon mapping for social links
 const iconMap = {
@@ -37,28 +38,20 @@ const Footer = () => {
             <h3 className="text-lg font-semibold text-foreground">Quick Links</h3>
             <ul className="space-y-2 text-sm">
               <li>
-                <a
-                  href="#about"
-                  className="text-muted-foreground hover:text-primary transition-colors"
-                >
-                  About Us
-                </a>
-              </li>
-              <li>
-                <a
-                  href="#contact"
-                  className="text-muted-foreground hover:text-primary transition-colors"
-                >
-                  Contact
-                </a>
-              </li>
-              <li>
-                <a
-                  href="#events"
+                <Link
+                  to="/events"
                   className="text-muted-foreground hover:text-primary transition-colors"
                 >
                   Events
-                </a>
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to="/contact"
+                  className="text-muted-foreground hover:text-primary transition-colors"
+                >
+                  Contact
+                </Link>
               </li>
             </ul>
           </div>

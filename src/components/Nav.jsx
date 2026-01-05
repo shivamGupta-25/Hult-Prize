@@ -4,6 +4,8 @@ import { Menu, Home, Users, Mail } from 'lucide-react'
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
+import { Separator } from '@/components/ui/separator'
+import { mottoData } from '@/Data/SiteData'
 
 const Nav = () => {
   const [isScrolled, setIsScrolled] = useState(false)
@@ -91,7 +93,7 @@ const Nav = () => {
                 <Menu className="h-6 w-6" />
               </Button>
             </SheetTrigger>
-            <SheetContent side="right" className="w-[280px] sm:w-[320px] p-0">
+            <SheetContent side="right" className="w-70 sm:w-[320px] p-0">
               <div className="flex flex-col h-full">
                 {/* Compact Header */}
                 <div className="px-5 pt-6 pb-4 border-b border-border">
@@ -151,13 +153,19 @@ const Nav = () => {
                     })}
                   </nav>
                 </div>
+                <div className="px-5 pb-6 text-center text-sm text-primary">
+                  <Separator className="my-4 bg-primary/10" />
+                  <p className="tracking-wide text-center italic font-medium">
+                    &ldquo;{mottoData.text}&rdquo;</p>
+                  <p className="text-sm text-muted-foreground">{mottoData.attribution} - Hansraj College</p>
+                </div>
               </div>
             </SheetContent>
           </Sheet>
         </div>
       </div>
     </nav>
-  )
-}
+  );
+};
 
-export default Nav
+export default Nav;
