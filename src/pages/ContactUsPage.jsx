@@ -1,6 +1,6 @@
 import contactData from '@/Data/Contact'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Mail, Phone, MapPin, Clock, Linkedin, Instagram, Twitter, Facebook } from 'lucide-react'
+import { Mail, Phone, MapPin, Clock, Linkedin, Instagram, Twitter, Facebook, MessageCircle } from 'lucide-react'
 import { Separator } from '@/components/ui/separator'
 import { sanitizePhone, formatAddress } from '@/lib/contactUtils'
 
@@ -9,7 +9,8 @@ const iconMap = {
   Linkedin,
   Instagram,
   Twitter,
-  Facebook
+  Facebook,
+  MessageCircle
 }
 
 export default function Contact() {

@@ -6,24 +6,27 @@ import { Teams } from './pages/TeamsPage';
 import Contact from './pages/ContactUsPage';
 import Footer from './components/Footer';
 import NotFound from './pages/NotFound';
+import { ThemeProvider } from "@/components/theme-provider"
 
 function App() {
   return (
-    <Router>
-      <ScrollToTop />
-      <div className="flex flex-col min-h-screen">
-        <Nav />
-        <main className="grow pt-16 md:pt-20">
-          <Routes>
-            <Route path="/" element={<HomePage />} />
-            <Route path="/teams" element={<Teams />} />
-            <Route path="/contact" element={<Contact />} />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </main>
-        <Footer />
-      </div>
-    </Router>
+    <ThemeProvider>
+      <Router>
+        <ScrollToTop />
+        <div className="flex flex-col min-h-screen">
+          <Nav />
+          <main className="grow pt-16 md:pt-20">
+            <Routes>
+              <Route path="/" element={<HomePage />} />
+              <Route path="/teams" element={<Teams />} />
+              <Route path="/contact" element={<Contact />} />
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </main>
+          <Footer />
+        </div>
+      </Router>
+    </ThemeProvider>
   );
 }
 

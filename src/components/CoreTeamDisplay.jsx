@@ -52,7 +52,7 @@ export const CoreTeamDisplay = ({ coreTeam, title = "Core Council" }) => {
                   {member.name}
                 </h4>
                 {member.role && (
-                  <p className="text-xs sm:text-sm text-muted-foreground font-medium px-2 sm:px-3 py-1 rounded-full bg-primary/5 border border-primary/10 inline-block">
+                  <p className="text-xs sm:text-sm text-muted-foreground font-medium px-2 sm:px-3 py-1 rounded-full bg-primary/5 border border-primary/10 inline-block dark:text-foreground">
                     {member.role}
                   </p>
                 )}
@@ -65,7 +65,7 @@ export const CoreTeamDisplay = ({ coreTeam, title = "Core Council" }) => {
                     href={member.linkedin}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="p-1.5 sm:p-2 rounded-full bg-primary/10 hover:bg-primary/20 text-primary transition-all duration-300"
+                    className="p-1.5 sm:p-2 rounded-full bg-primary/10 hover:bg-primary/20 text-primary transition-all duration-300 hover:ring-1 hover:shadow-[0_0_14px_6px_rgba(0,0,0,0.12)] dark:hover:shadow-[0_0_18px_8px_rgba(255,255,255,0.28)]"
                     aria-label={`${member.name}'s LinkedIn`}
                   >
                     <Linkedin className="h-4 w-4" />
@@ -74,7 +74,7 @@ export const CoreTeamDisplay = ({ coreTeam, title = "Core Council" }) => {
                 {member.mail && (
                   <a
                     href={`mailto:${member.mail}`}
-                    className="p-1.5 sm:p-2 rounded-full bg-primary/10 hover:bg-primary/20 text-primary transition-all duration-300"
+                    className="p-1.5 sm:p-2 rounded-full bg-primary/10 hover:bg-primary/20 text-primary transition-all duration-300 hover:ring-1 hover:shadow-[0_0_14px_6px_rgba(0,0,0,0.12)] dark:hover:shadow-[0_0_18px_8px_rgba(255,255,255,0.28)]"
                     aria-label={`Email ${member.name}`}
                   >
                     <Mail className="h-4 w-4" />

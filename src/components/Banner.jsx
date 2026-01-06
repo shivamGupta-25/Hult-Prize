@@ -101,9 +101,12 @@ export default function Banner() {
         ))}
       </div>
       {/* Blur the bottom of the section - responsive gradient fade */}
-      <div className="pointer-events-none absolute -bottom-1 md:-bottom-8 sm:bottom-0 left-0 w-full h-12 sm:h-20 md:h-24 lg:h-22 z-30">
+      <div className="pointer-events-none absolute -bottom-1 sm:bottom-0 md:-bottom-8 left-0 w-full h-12 sm:h-20 md:h-24 lg:h-22 z-30">
+        {/* Blur layer */}
         <div className="absolute inset-0 backdrop-blur-sm" />
-        <div className="absolute inset-0 bg-linear-to-t from-white via-white/95 to-transparent" />
+        {/* Gradient overlay */}
+        <div
+          className="absolute inset-0 bg-linear-to-t from-background via-background/95 to-transparent" />
       </div>
     </div>
   )
