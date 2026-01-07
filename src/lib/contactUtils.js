@@ -89,4 +89,3 @@ export const useDeveloperInfo = () => {
 
   return { developerInfo, loading, fallbackName: FALLBACK_NAME };
 };
-

@@ -1,10 +1,11 @@
+"use client"
+
 import React from 'react';
-import { Link } from 'react-router-dom';
+import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Home, MoveLeft } from 'lucide-react';
-import { cn } from '@/lib/utils';
 
-const NotFound = () => {
+export default function NotFound() {
   return (
     <div className="min-h-[80vh] flex flex-col items-center justify-center p-4 text-center animate-in fade-in duration-500">
       {/* 404 Text */}
@@ -24,16 +25,14 @@ const NotFound = () => {
         {/* Actions */}
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
           <Button asChild variant="default" size="lg" className="gap-2">
-            <Link to="/">
+            <Link href="/">
               <Home className="w-4 h-4" />
               Back to Home
             </Link>
           </Button>
-          <Button asChild variant="outline" size="lg" className="gap-2">
-            <Link to="#" onClick={() => window.history.back()}>
-              <MoveLeft className="w-4 h-4" />
-              Go Back
-            </Link>
+          <Button variant="outline" size="lg" className="gap-2" onClick={() => window.history.back()}>
+            <MoveLeft className="w-4 h-4" />
+            Go Back
           </Button>
         </div>
       </div>
@@ -43,6 +42,4 @@ const NotFound = () => {
       <div className="absolute bottom-1/3 right-1/4 w-32 h-32 bg-secondary/20 rounded-full blur-3xl -z-10" />
     </div>
   );
-};
-
-export default NotFound;
+}

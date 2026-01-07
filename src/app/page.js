@@ -1,16 +1,13 @@
-import Banner from '@/components/Banner'
-import { Motto } from '@/components/Motto'
-import About from '@/components/About'
+import Banner from "@/components/Banner";
+import { Motto } from "@/components/Motto";
+import About from "@/components/About";
 import { CoreTeamDisplay } from '@/components/CoreTeamDisplay'
-import TeamData from '@/Data/TeamData'
-import React from 'react'
+import TeamData from "@/Data/TeamData";
 
-const HomePage = () => {
-  // Get the latest session's core team
+export default function Home() {
   const years = Object.keys(TeamData).sort((a, b) => b.localeCompare(a));
   const latestYear = years[0];
   const coreTeam = TeamData[latestYear]?.council?.coreTeam || [];
-
   return (
     <>
       <Banner />
@@ -24,7 +21,5 @@ const HomePage = () => {
         </section>
       )}
     </>
-  )
+  );
 }
-
-export default HomePage

@@ -1,7 +1,7 @@
 const contactData = {
   title: "Contact Us",
   description:
-    "We’d love to hear from you! Whether you have questions, feedback, or need assistance, feel free to reach out to us using the information below.",
+    "We'd love to hear from you! Whether you have questions, feedback, or need assistance, feel free to reach out to us using the information below.",
 
   organization: "Hult Prize - Hansraj College",
 
@@ -37,24 +37,8 @@ const contactData = {
       url: "#",
       icon: "Instagram"
     }
-    /*
-    {
-      platform: "WhatsApp",
-      url: "#",
-      icon: "MessageCircle"
-    },
-    {
-      platform: "Twitter",
-      url: "#",
-      icon: "Twitter"
-    },
-    {
-      platform: "Facebook",
-      url: "#",
-      icon: "Facebook"
-    }
-    */
   ]
 };
 
 export default contactData;
+

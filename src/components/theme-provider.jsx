@@ -1,3 +1,5 @@
+'use client';
+
 import { createContext, useContext, useEffect, useState } from "react";
 
 const ThemeProviderContext = createContext({
@@ -8,14 +10,24 @@ const ThemeProviderContext = createContext({
 export function ThemeProvider({
   children,
   defaultTheme = "system",
-  storageKey = "vite-ui-theme",
+  storageKey = "nextjs-ui-theme",
   ...props
 }) {
-  const [theme, setTheme] = useState(() => {
-    return localStorage.getItem(storageKey) || defaultTheme;
-  });
+  const [theme, setTheme] = useState(defaultTheme);
+  const [mounted, setMounted] = useState(false);
+
+  // Initialize theme from localStorage after mount
+  useEffect(() => {
+    setMounted(true);
+    const storedTheme = localStorage.getItem(storageKey);
+    if (storedTheme) {
+      setTheme(storedTheme);
+    }
+  }, [storageKey]);
 
   useEffect(() => {
+    if (!mounted) return;
+
     const root = window.document.documentElement;
 
     root.classList.remove("light", "dark");
@@ -32,7 +44,7 @@ export function ThemeProvider({
     }
 
     root.classList.add(theme);
-  }, [theme]);
+  }, [theme, mounted]);
 
   const value = {
     theme,
@@ -41,6 +53,11 @@ export function ThemeProvider({
       setTheme(newTheme);
     },
   };
+
+  // Prevent flash of wrong theme
+  if (!mounted) {
+    return null;
+  }
 
   return (
     <ThemeProviderContext.Provider value={value} {...props}>

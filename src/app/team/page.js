@@ -1,13 +1,14 @@
+'use client';
+
 import TeamData from '@/Data/TeamData';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
-import { Card, CardContent } from '@/components/ui/card';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { CoreTeamDisplay } from '@/components/CoreTeamDisplay';
 
-export const Teams = () => {
+export default function Teams() {
   const years = Object.keys(TeamData).sort((a, b) => b.localeCompare(a));
   const [activeYear, setActiveYear] = useState(years[0]);
 

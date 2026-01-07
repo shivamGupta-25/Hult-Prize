@@ -1,8 +1,10 @@
+'use client';
+
 import { Separator } from "@/components/ui/separator";
 import contactData from "@/Data/Contact";
 import { Mail, Phone, MapPin, Linkedin, Instagram } from "lucide-react";
 import { sanitizePhone, formatAddressString, useDeveloperInfo } from "@/lib/contactUtils";
-import { Link } from "react-router-dom";
+import Link from "next/link";
 
 // Icon mapping for social links
 const iconMap = {
@@ -39,15 +41,15 @@ const Footer = () => {
             <ul className="space-y-2 text-sm">
               <li>
                 <Link
-                  to="/events"
+                  href="/team"
                   className="text-muted-foreground hover:text-primary transition-colors"
                 >
-                  Events
+                  Team
                 </Link>
               </li>
               <li>
                 <Link
-                  to="/contact"
+                  href="/contact"
                   className="text-muted-foreground hover:text-primary transition-colors"
                 >
                   Contact

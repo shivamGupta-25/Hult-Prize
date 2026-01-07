@@ -1,3 +1,5 @@
+'use client'
+
 import contactData from '@/Data/Contact'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Mail, Phone, MapPin, Clock, Linkedin, Instagram, Twitter, Facebook, MessageCircle } from 'lucide-react'

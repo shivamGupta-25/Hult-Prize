@@ -1,4 +1,5 @@
-import React from 'react';
+'use client';
+
 import { Card, CardContent } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { Quote, Globe, Users, Target } from 'lucide-react';

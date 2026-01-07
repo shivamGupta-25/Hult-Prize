@@ -1,11 +1,12 @@
 const TeamData = {
+
   "2025-26": {
     academicYear: "2025-26",
 
     council: {
       coreTeam: [
         { name: "Yash Gupta", role: "Campus Director", image: "/Council/2025-26/YashGupta.jpg", linkedin: "https://www.linkedin.com/in/yash-gupta-1234567890/", mail: "yashgupta@hultprize.org" },
-        { name: "Mahak Poswal", role: "President", image: "/Council/2025-26/MahakPoswal.jpg", linkedin: null },
+        { name: "Mahak Poswal", role: "President", image: "/Council/2025-26/MahakPoswal.jpg", linkedin: "https://www.linkedin.com/in/mahak-poswal-261042280/", mail: "mahakposwal@hultprize.org" },
         { name: "Hrishikesh Tamuli", role: "Vice President", image: "/Council/2025-26/HrishikeshTamuli.jpg", linkedin: null },
         { name: "Merryl Biju", role: "General Secretary", image: "/Council/2025-26/Merryl.jpg", linkedin: null },
         { name: "Ayushman Dubey", role: "Joint Secretary", image: "/Council/2025-26/Ayushman.jpg", linkedin: null }

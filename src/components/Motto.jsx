@@ -1,12 +1,13 @@
-import React from 'react'
+'use client';
+
 import { mottoData } from "@/Data/SiteData";
-import { Card, CardContent } from '@/components/ui/card'
+import { Card, CardContent } from '@/components/ui/card';
 
 export const Motto = () => {
-  const { text, attribution } = mottoData
+  const { text, attribution } = mottoData;
 
   // Extract first sentence for display
-  const firstSentence = text.split('.')[0]
+  const firstSentence = text.split('.')[0];
 
   return (
     <section className="w-full py-12 px-4 md:py-16 sm:px-6 lg:py-20 lg:px-8">
@@ -40,5 +41,5 @@ export const Motto = () => {
         </Card>
       </div>
     </section>
-  )
-}
+  );
+};

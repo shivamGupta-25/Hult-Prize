@@ -1,4 +1,5 @@
-import React from 'react';
+'use client';
+
 import { Card, CardContent } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Linkedin, Mail } from 'lucide-react';
@@ -90,4 +91,3 @@ export const CoreTeamDisplay = ({ coreTeam, title = "Core Council" }) => {
 };
 
 export default CoreTeamDisplay;
-
