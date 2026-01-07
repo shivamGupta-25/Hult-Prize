@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import Image from 'next/image';
 import { Menu, Home, Users, Mail } from 'lucide-react';
-import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
+import { Sheet, SheetContent, SheetTrigger, SheetTitle } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { Separator } from '@/components/ui/separator';
@@ -15,10 +15,12 @@ import { ModeToggle } from '@/components/mode-toggle';
 const Nav = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
   const pathname = usePathname();
 
-  // Handle scroll detection for navbar styling
+  // Ensure component is mounted before applying scroll-based styles to prevent hydration mismatch
   useEffect(() => {
+    setMounted(true);
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 20);
     };
@@ -38,7 +40,7 @@ const Nav = () => {
     <nav
       className={cn(
         'fixed top-0 left-0 right-0 z-50 transition-all duration-300',
-        isScrolled
+        mounted && isScrolled
           ? 'bg-background/95 backdrop-blur-md border-b border-border shadow-sm'
           : 'bg-background/80 backdrop-blur-sm'
       )}
@@ -106,6 +108,7 @@ const Nav = () => {
                 </Button>
               </SheetTrigger>
               <SheetContent side="right" className="w-70 sm:w-[320px] p-0">
+                <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
                 <div className="flex flex-col h-full">
                   {/* Compact Header */}
                   <div className="px-5 pt-6 pb-4 border-b border-border">
