@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import { useParams } from 'next/navigation'
 import Image from 'next/image'
 import Link from 'next/link'
-import { Card, CardContent } from '@/components/ui/card'
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Separator } from '@/components/ui/separator'
@@ -26,6 +26,7 @@ import {
   Check,
   ArrowLeft,
   Eye,
+  ArrowRight,
 } from 'lucide-react'
 import { format } from 'date-fns'
 import { toast } from 'sonner'
@@ -290,21 +291,23 @@ export default function BlogDetailPage() {
 
           {/* Engagement Section */}
           <Separator className="my-8" />
-          <div className="flex flex-wrap items-center gap-4 mb-8">
-            <Button
-              variant={engagement.userLiked ? 'default' : 'outline'}
-              onClick={() => handleEngagement('like')}
-            >
-              <ThumbsUp className="mr-2 h-4 w-4" />
-              {engagement.likes}
-            </Button>
-            <Button
-              variant={engagement.userDisliked ? 'default' : 'outline'}
-              onClick={() => handleEngagement('dislike')}
-            >
-              <ThumbsDown className="mr-2 h-4 w-4" />
-            </Button>
-            <div className="flex items-center gap-2 ml-auto">
+          <div className="flex flex-wrap items-center gap-4 mb-8 justify-between">
+            <div className="flex gap-2">
+              <Button
+                variant={engagement.userLiked ? 'default' : 'outline'}
+                onClick={() => handleEngagement('like')}
+              >
+                <ThumbsUp className="mr-2 h-4 w-4" />
+                {engagement.likes}
+              </Button>
+              <Button
+                variant={engagement.userDisliked ? 'default' : 'outline'}
+                onClick={() => handleEngagement('dislike')}
+              >
+                <ThumbsDown className="mr-2 h-4 w-4" />
+              </Button>
+            </div>
+            <div className="flex items-center gap-2">
               <span className="text-sm text-muted-foreground">Share:</span>
               <Button variant="ghost" size="icon-sm" onClick={() => handleShare('twitter')}>
                 <Twitter className="h-4 w-4" />
@@ -334,7 +337,7 @@ export default function BlogDetailPage() {
 
             {/* Comment Form */}
             <Card className="mb-6">
-              <CardContent className="pt-6">
+              <CardContent className="p-6">
                 <form onSubmit={handleComment} className="space-y-4">
                   <div>
                     <Input
@@ -366,7 +369,7 @@ export default function BlogDetailPage() {
               ) : (
                 engagement.comments?.map((comment, index) => (
                   <Card key={index}>
-                    <CardContent className="pt-6">
+                    <CardContent>
                       <div className="flex items-start gap-4">
                         <Avatar>
                           <AvatarFallback>{comment.author.charAt(0).toUpperCase()}</AvatarFallback>
@@ -392,35 +395,92 @@ export default function BlogDetailPage() {
           {recommendedBlogs.length > 0 && (
             <>
               <Separator className="my-8" />
-              <div>
-                <h2 className="text-2xl font-bold mb-6">Recommended Blogs</h2>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  {recommendedBlogs.map((recBlog) => (
+              <div className="flex items-start justify-between gap-3 mb-4">
+                <div>
+                  <h2 className="text-2xl font-bold">Recommended for you</h2>
+                  <p className="text-sm text-muted-foreground">Fresh picks from our latest and most liked posts.</p>
+                </div>
+                <Badge variant="secondary" className="hidden md:inline-flex">Curated</Badge>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {recommendedBlogs.map((recBlog) => {
+                  const isRecent = recBlog.publishedAt
+                    ? (Date.now() - new Date(recBlog.publishedAt).getTime()) / (1000 * 60 * 60 * 24) <= 14
+                    : false
+
+                  return (
                     <Link key={recBlog._id} href={`/blogs/${recBlog.slug}`}>
-                      <Card className="h-full hover:shadow-lg transition-all cursor-pointer group">
+                      <Card className="h-full hover:shadow-lg transition-all duration-300 cursor-pointer group overflow-hidden pt-0 border-border/70">
                         {recBlog.posterImage && (
-                          <div className="relative h-32 w-full overflow-hidden rounded-t-lg">
+                          <div className="relative h-36 w-full overflow-hidden">
                             <Image
                               src={recBlog.posterImage}
                               alt={recBlog.title}
                               fill
-                              className="object-cover group-hover:scale-105 transition-transform"
+                              className="object-cover group-hover:scale-105 transition-transform duration-300"
                             />
+                            <div className="absolute inset-0 bg-linear-to-t from-background/80 via-background/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                            {isRecent && (
+                              <Badge className="absolute top-3 left-3" variant="default">
+                                New
+                              </Badge>
+                            )}
                           </div>
                         )}
-                        <CardContent className="pt-4">
-                          <h3 className="font-semibold line-clamp-2 group-hover:text-primary transition-colors mb-2">
+                        <CardHeader className="space-y-2">
+                          <CardTitle className="line-clamp-2 group-hover:text-primary transition-colors text-lg">
                             {recBlog.title}
-                          </h3>
-                          <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                            <ThumbsUp className="h-3 w-3" />
-                            <span>{recBlog.likes?.length || 0}</span>
+                          </CardTitle>
+                          <CardDescription className="flex items-center gap-2 text-xs text-muted-foreground">
+                            <div className="flex items-center gap-1">
+                              <User className="h-3.5 w-3.5" />
+                              <span className="truncate">{recBlog.author}</span>
+                            </div>
+                            {recBlog.publishedAt && (
+                              <>
+                                <span className="text-muted-foreground/50">•</span>
+                                <div className="flex items-center gap-1">
+                                  <Calendar className="h-3.5 w-3.5" />
+                                  <span>{format(new Date(recBlog.publishedAt), 'MMM d, yyyy')}</span>
+                                </div>
+                              </>
+                            )}
+                          </CardDescription>
+                        </CardHeader>
+                        <CardContent className="pt-0 space-y-4">
+                          {recBlog.excerpt && (
+                            <p className="text-sm text-muted-foreground line-clamp-2">{recBlog.excerpt}</p>
+                          )}
+                          <div className="flex items-center justify-between text-xs text-muted-foreground">
+                            <div className="flex items-center gap-3">
+                              <Badge variant="outline" className="text-[11px] px-2 py-0">
+                                {recBlog.category || 'Blog'}
+                              </Badge>
+                              <div className="flex items-center gap-2 text-muted-foreground/80">
+                                <div className="flex items-center gap-1">
+                                  <ThumbsUp className="h-3.5 w-3.5" />
+                                  <span>{recBlog.likes?.length || 0}</span>
+                                </div>
+                                <span className="text-muted-foreground/40">•</span>
+                                <div className="flex items-center gap-1">
+                                  <Eye className="h-3.5 w-3.5" />
+                                  <span>{recBlog.views || 0}</span>
+                                </div>
+                              </div>
+                              {recBlog.readingTime && (
+                                <span className="text-muted-foreground/80">{recBlog.readingTime} min read</span>
+                              )}
+                            </div>
+                            <div className="flex items-center gap-1 text-primary group-hover:gap-1.5 transition-all">
+                              <span>Read</span>
+                              <ArrowRight className="h-4 w-4" />
+                            </div>
                           </div>
                         </CardContent>
                       </Card>
                     </Link>
-                  ))}
-                </div>
+                  )
+                })}
               </div>
             </>
           )}
