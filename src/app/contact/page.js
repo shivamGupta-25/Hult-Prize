@@ -208,7 +208,7 @@ export default function Contact() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="w-full h-[400px] rounded-lg overflow-hidden">
+              <div className="w-full h-100 rounded-lg overflow-hidden">
                 <iframe
                   src={googleMapsUrl}
                   width="100%"

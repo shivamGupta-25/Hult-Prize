@@ -113,7 +113,6 @@
   --sidebar-ring: oklch(0.41 0.159 10.272);
 }
 
-
 @layer base {
   * {
     @apply border-border outline-ring/50;
@@ -123,10 +122,6 @@
     @apply bg-background text-foreground;
   }
 
-  html{
-    scroll-behavior: smooth;
-  }
-
   /* Hide scrollbar for Chrome, Safari and Opera */
   ::-webkit-scrollbar {
     display: none;
@@ -134,7 +129,77 @@
 
   /* Hide scrollbar for IE, Edge and Firefox */
   html {
-    -ms-overflow-style: none;
-    scrollbar-width: none;
+    -ms-overflow-style: none; /* IE and Edge */
+    scrollbar-width: none; /* Firefox */
+  }
+
+  /* Blog content prose styles */
+  .prose {
+    @apply text-foreground;
+  }
+
+  .prose h1 {
+    @apply text-3xl md:text-4xl font-bold mb-4 mt-8 text-foreground;
+  }
+
+  .prose h2 {
+    @apply text-2xl md:text-3xl font-bold mb-3 mt-6 text-foreground;
+  }
+
+  .prose h3 {
+    @apply text-xl md:text-2xl font-semibold mb-2 mt-4 text-foreground;
+  }
+
+  .prose p {
+    @apply mb-4 leading-relaxed text-foreground/90;
+  }
+
+  .prose ul,
+  .prose ol {
+    @apply mb-4 pl-6;
+  }
+
+  .prose ul {
+    @apply list-disc;
+  }
+
+  .prose ol {
+    @apply list-decimal;
+  }
+
+  .prose li {
+    @apply mb-2 text-foreground/90;
+  }
+
+  .prose blockquote {
+    @apply border-l-4 border-primary pl-4 italic my-4 text-muted-foreground;
+  }
+
+  .prose a {
+    @apply text-primary underline hover:text-primary/80;
+  }
+
+  .prose img {
+    @apply rounded-lg my-4 max-w-full h-auto;
+  }
+
+  .prose strong {
+    @apply font-semibold text-foreground;
+  }
+
+  .prose em {
+    @apply italic;
+  }
+
+  .prose code {
+    @apply bg-muted px-1.5 py-0.5 rounded text-sm font-mono;
+  }
+
+  .prose pre {
+    @apply bg-muted p-4 rounded-lg overflow-x-auto my-4;
+  }
+
+  .prose pre code {
+    @apply bg-transparent p-0;
   }
 }

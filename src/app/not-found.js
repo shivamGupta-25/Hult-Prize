@@ -18,7 +18,7 @@ export default function NotFound() {
         <h2 className="text-3xl md:text-4xl font-bold tracking-tight text-foreground">
           Page not found
         </h2>
-        <p className="text-muted-foreground max-w-[500px] mx-auto text-lg">
+        <p className="text-muted-foreground max-w-125 mx-auto text-lg">
           Sorry, we couldn't find the page you're looking for. It might have been moved or doesn't exist.
         </p>
 
