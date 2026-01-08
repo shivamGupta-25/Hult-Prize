@@ -64,7 +64,7 @@ export default function AdminBlogsPage() {
     try {
       const params = new URLSearchParams({
         published: '', // Get all blogs
-        sortBy: 'createdAt',
+        sortBy: 'publishedAt',
         order: 'desc',
         limit: '1000', // Fetch all blogs for client-side pagination
       })
@@ -132,11 +132,24 @@ export default function AdminBlogsPage() {
     }
   }
 
-  const handleLogout = () => {
-    document.cookie = 'admin_session=; path=/; max-age=0'
-    router.push('/admin/login')
-    toast.success('Logged out successfully')
+  const handleLogout = async () => {
+    try {
+      const response = await fetch('/api/auth/logout', {
+        method: 'POST',
+      })
+
+      if (response.ok) {
+        toast.success('Logged out successfully')
+        router.push('/admin/login')
+      } else {
+        toast.error('Logout failed')
+      }
+    } catch (error) {
+      console.error('Logout error:', error)
+      toast.error('An error occurred during logout')
+    }
   }
+
 
   // Derived data: filter and paginate on the client
   const { paginatedBlogs, totalPages, totalFiltered } = useMemo(() => {
