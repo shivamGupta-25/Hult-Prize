@@ -85,7 +85,7 @@ const MenuBar = ({ editor }) => {
     const reader = new FileReader()
     reader.onloadend = async () => {
       const base64String = reader.result
-      
+
       try {
         // Upload to API
         const response = await fetch('/api/images/upload', {
@@ -93,7 +93,7 @@ const MenuBar = ({ editor }) => {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ image: base64String }),
         })
-        
+
         const data = await response.json()
         if (data.url) {
           editor.chain().focus().setImage({ src: data.url }).run()
@@ -110,7 +110,7 @@ const MenuBar = ({ editor }) => {
   }
 
   return (
-    <div className="border-b border-border bg-card rounded-t-lg">
+    <div className="border-b border-border rounded-t-lg sticky top-0 z-10 backdrop-blur-sm bg-card/95">
       <div className="flex flex-wrap items-center gap-1 p-2">
         {/* Undo/Redo */}
         <Button
@@ -347,7 +347,7 @@ const MenuBar = ({ editor }) => {
   )
 }
 
-export default function BlogEditor({ content, onChange, className }) {
+export default function BlogEditor({ content, onChange, className, contentClassName }) {
   const editor = useEditor({
     extensions: [
       StarterKit,
@@ -380,9 +380,14 @@ export default function BlogEditor({ content, onChange, className }) {
   })
 
   return (
-    <div className={cn('border border-border rounded-lg bg-background', className)}>
+    <div className={cn('border border-border rounded-lg bg-background flex flex-col overflow-hidden', className)}>
       <MenuBar editor={editor} />
-      <EditorContent editor={editor} className="min-h-[400px] max-h-[600px] overflow-y-auto" />
+      <div className="flex-1 overflow-y-auto">
+        <EditorContent
+          editor={editor}
+          className={cn('min-h-[400px]', contentClassName)}
+        />
+      </div>
     </div>
   )
 }

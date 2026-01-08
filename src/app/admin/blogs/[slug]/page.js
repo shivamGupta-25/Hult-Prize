@@ -239,15 +239,15 @@ export default function EditBlogPage() {
           </Button>
         </Link>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Main Form */}
-          <div className="lg:col-span-2">
-            <Card>
-              <CardHeader>
-                <CardTitle>Edit Blog</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <form onSubmit={handleSubmit} className="space-y-6">
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            {/* Main Details */}
+            <div className="lg:col-span-2 order-1">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Edit Blog</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-6">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <Label htmlFor="title">Title *</Label>
@@ -321,14 +321,6 @@ export default function EditBlogPage() {
                     )}
                   </div>
 
-                  <div className="space-y-2">
-                    <Label htmlFor="content">Content *</Label>
-                    <BlogEditor
-                      content={formData.content}
-                      onChange={(content) => setFormData(prev => ({ ...prev, content }))}
-                    />
-                  </div>
-
                   <div className="flex items-center gap-2">
                     <input
                       type="checkbox"
@@ -341,101 +333,190 @@ export default function EditBlogPage() {
                       Published
                     </Label>
                   </div>
+                </CardContent>
+              </Card>
+            </div>
 
-                  <div className="flex justify-end gap-4">
-                    <Button
-                      type="button"
-                      variant="destructive"
-                      onClick={() => setDeleteDialog(true)}
-                    >
-                      <Trash2 className="mr-2 h-4 w-4" />
-                      Delete
-                    </Button>
-                    <Button type="submit" disabled={saving}>
-                      {saving ? 'Saving...' : 'Save Changes'}
-                    </Button>
-                  </div>
-                </form>
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* Engagement Sidebar */}
-          <div className="lg:col-span-1">
-            <Card>
-              <CardHeader>
-                <CardTitle>Engagement</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                <div>
-                  <div className="flex items-center justify-between mb-2">
-                    <div className="flex items-center gap-2">
-                      <ThumbsUp className="h-4 w-4" />
-                      <span>Likes</span>
+            {/* Engagement Sidebar - Hidden on mobile, shown on lg+ */}
+            <div className="lg:col-span-1 order-2 hidden lg:block">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Engagement</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  <div>
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="flex items-center gap-2">
+                        <ThumbsUp className="h-4 w-4" />
+                        <span>Likes</span>
+                      </div>
+                      <span className="font-semibold">{engagement.likes}</span>
                     </div>
-                    <span className="font-semibold">{engagement.likes}</span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <ThumbsDown className="h-4 w-4" />
-                      <span>Dislikes</span>
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <ThumbsDown className="h-4 w-4" />
+                        <span>Dislikes</span>
+                      </div>
+                      <span className="font-semibold">{engagement.dislikes}</span>
                     </div>
-                    <span className="font-semibold">{engagement.dislikes}</span>
                   </div>
-                </div>
 
-                <Separator />
+                  <Separator />
 
-                <div>
-                  <div className="flex items-center gap-2 mb-4">
-                    <MessageCircle className="h-4 w-4" />
-                    <span className="font-semibold">Comments ({engagement.comments?.length || 0})</span>
-                  </div>
-                  <div className="space-y-3 max-h-96 overflow-y-auto">
-                    {engagement.comments?.length === 0 ? (
-                      <p className="text-sm text-muted-foreground">No comments yet</p>
-                    ) : (
-                      engagement.comments?.map((comment) => (
-                        <div key={comment._id} className="p-3 border rounded-lg space-y-2">
-                          <div className="flex items-start justify-between">
-                            <div className="flex-1">
-                              <p className="font-semibold text-sm">{comment.author}</p>
-                              <p className="text-sm text-muted-foreground">
-                                {format(new Date(comment.createdAt), 'MMM d, yyyy')}
-                              </p>
+                  <div>
+                    <div className="flex items-center gap-2 mb-4">
+                      <MessageCircle className="h-4 w-4" />
+                      <span className="font-semibold">Comments ({engagement.comments?.length || 0})</span>
+                    </div>
+                    <div className="space-y-3 max-h-104 overflow-y-auto">
+                      {engagement.comments?.length === 0 ? (
+                        <p className="text-sm text-muted-foreground">No comments yet</p>
+                      ) : (
+                        engagement.comments?.map((comment) => (
+                          <div key={comment._id} className="p-3 border rounded-lg space-y-2">
+                            <div className="flex items-start justify-between">
+                              <div className="flex-1">
+                                <p className="font-semibold text-sm">{comment.author}</p>
+                                <p className="text-sm text-muted-foreground">
+                                  {format(new Date(comment.createdAt), 'MMM d, yyyy')}
+                                </p>
+                              </div>
+                              {!comment.isApproved && (
+                                <span className="text-xs bg-yellow-500/20 text-yellow-600 dark:text-yellow-400 px-2 py-1 rounded">
+                                  Pending
+                                </span>
+                              )}
                             </div>
-                            {!comment.isApproved && (
-                              <span className="text-xs bg-yellow-500/20 text-yellow-600 dark:text-yellow-400 px-2 py-1 rounded">
-                                Pending
-                              </span>
-                            )}
+                            <p className="text-sm">{comment.content}</p>
+                            <div className="flex gap-2">
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={() => handleCommentToggle(comment._id, !comment.isApproved)}
+                              >
+                                {comment.isApproved ? 'Unapprove' : 'Approve'}
+                              </Button>
+                              <Button
+                                size="sm"
+                                variant="destructive"
+                                onClick={() => handleDeleteComment(comment._id)}
+                              >
+                                Delete
+                              </Button>
+                            </div>
                           </div>
-                          <p className="text-sm">{comment.content}</p>
-                          <div className="flex gap-2">
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              onClick={() => handleCommentToggle(comment._id, !comment.isApproved)}
-                            >
-                              {comment.isApproved ? 'Unapprove' : 'Approve'}
-                            </Button>
-                            <Button
-                              size="sm"
-                              variant="destructive"
-                              onClick={() => handleDeleteComment(comment._id)}
-                            >
-                              Delete
-                            </Button>
-                          </div>
-                        </div>
-                      ))
-                    )}
+                        ))
+                      )}
+                    </div>
                   </div>
-                </div>
-              </CardContent>
-            </Card>
+                </CardContent>
+              </Card>
+            </div>
           </div>
-        </div>
+
+          {/* Wide Editor */}
+          <Card className="order-3">
+            <CardHeader>
+              <CardTitle>Content</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <BlogEditor
+                content={formData.content}
+                onChange={(content) => setFormData(prev => ({ ...prev, content }))}
+                contentClassName="min-h-[720px]"
+                className="h-[800px]"
+              />
+
+              <div className="flex justify-end gap-4">
+                <Button
+                  type="button"
+                  variant="destructive"
+                  onClick={() => setDeleteDialog(true)}
+                >
+                  <Trash2 className="mr-2 h-4 w-4" />
+                  Delete
+                </Button>
+                <Button type="submit" disabled={saving}>
+                  {saving ? 'Saving...' : 'Save Changes'}
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Engagement Sidebar - Shown on mobile below editor */}
+          <Card className="order-4 lg:hidden">
+            <CardHeader>
+              <CardTitle>Engagement</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <div className="flex items-center gap-2">
+                    <ThumbsUp className="h-4 w-4" />
+                    <span>Likes</span>
+                  </div>
+                  <span className="font-semibold">{engagement.likes}</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <ThumbsDown className="h-4 w-4" />
+                    <span>Dislikes</span>
+                  </div>
+                  <span className="font-semibold">{engagement.dislikes}</span>
+                </div>
+              </div>
+
+              <Separator />
+
+              <div>
+                <div className="flex items-center gap-2 mb-4">
+                  <MessageCircle className="h-4 w-4" />
+                  <span className="font-semibold">Comments ({engagement.comments?.length || 0})</span>
+                </div>
+                <div className="space-y-3 max-h-96 overflow-y-auto">
+                  {engagement.comments?.length === 0 ? (
+                    <p className="text-sm text-muted-foreground">No comments yet</p>
+                  ) : (
+                    engagement.comments?.map((comment) => (
+                      <div key={comment._id} className="p-3 border rounded-lg space-y-2">
+                        <div className="flex items-start justify-between">
+                          <div className="flex-1">
+                            <p className="font-semibold text-sm">{comment.author}</p>
+                            <p className="text-sm text-muted-foreground">
+                              {format(new Date(comment.createdAt), 'MMM d, yyyy')}
+                            </p>
+                          </div>
+                          {!comment.isApproved && (
+                            <span className="text-xs bg-yellow-500/20 text-yellow-600 dark:text-yellow-400 px-2 py-1 rounded">
+                              Pending
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-sm">{comment.content}</p>
+                        <div className="flex gap-2">
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => handleCommentToggle(comment._id, !comment.isApproved)}
+                          >
+                            {comment.isApproved ? 'Unapprove' : 'Approve'}
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="destructive"
+                            onClick={() => handleDeleteComment(comment._id)}
+                          >
+                            Delete
+                          </Button>
+                        </div>
+                      </div>
+                    ))
+                  )}
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </form>
 
         {/* Delete Dialog */}
         <AlertDialog open={deleteDialog} onOpenChange={setDeleteDialog}>

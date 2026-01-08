@@ -59,14 +59,14 @@ export default function NewBlogPage() {
     const reader = new FileReader()
     reader.onloadend = async () => {
       const base64String = reader.result
-      
+
       try {
         const response = await fetch('/api/images/upload', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ image: base64String }),
         })
-        
+
         const data = await response.json()
         if (data.url) {
           setFormData(prev => ({ ...prev, posterImage: data.url }))
@@ -176,6 +176,7 @@ export default function NewBlogPage() {
                 <BlogEditor
                   content={formData.content}
                   onChange={(content) => setFormData(prev => ({ ...prev, content }))}
+                  className="h-[600px]"
                 />
               </div>
 

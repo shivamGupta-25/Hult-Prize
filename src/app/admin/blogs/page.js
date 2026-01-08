@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -8,6 +8,16 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Separator } from '@/components/ui/separator'
 import { Skeleton } from '@/components/ui/skeleton'
+import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group'
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationPrevious,
+  PaginationNext,
+  PaginationEllipsis,
+} from '@/components/ui/pagination'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -41,6 +51,9 @@ export default function AdminBlogsPage() {
   const [loading, setLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState('')
   const [deleteDialog, setDeleteDialog] = useState({ open: false, blog: null })
+  const [statusFilter, setStatusFilter] = useState('all') // all | published | draft
+  const [page, setPage] = useState(1)
+  const pageSize = 8
 
   useEffect(() => {
     fetchBlogs()
@@ -53,15 +66,16 @@ export default function AdminBlogsPage() {
         published: '', // Get all blogs
         sortBy: 'createdAt',
         order: 'desc',
+        limit: '1000', // Fetch all blogs for client-side pagination
       })
-      
+
       if (searchQuery) {
         params.append('search', searchQuery)
       }
 
       const response = await fetch(`/api/blogs?${params}`)
       const data = await response.json()
-      
+
       if (response.ok) {
         setBlogs(data.blogs || [])
       } else {
@@ -124,145 +138,290 @@ export default function AdminBlogsPage() {
     toast.success('Logged out successfully')
   }
 
+  // Derived data: filter and paginate on the client
+  const { paginatedBlogs, totalPages, totalFiltered } = useMemo(() => {
+    const filtered = blogs.filter((blog) => {
+      if (statusFilter === 'published') return blog.isPublished
+      if (statusFilter === 'draft') return !blog.isPublished
+      return true
+    })
+
+    const pages = Math.max(1, Math.ceil(filtered.length / pageSize))
+    const currentPage = Math.min(page, pages)
+    const start = (currentPage - 1) * pageSize
+    const end = start + pageSize
+
+    return {
+      paginatedBlogs: filtered.slice(start, end),
+      totalPages: pages,
+      totalFiltered: filtered.length,
+    }
+  }, [blogs, statusFilter, page, pageSize])
+
+  // Ensure current page is valid when filters/search change
+  useEffect(() => {
+    setPage(1)
+  }, [statusFilter, searchQuery])
+
   return (
     <div className="min-h-screen bg-background">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         {/* Header */}
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
-          <div>
-            <h1 className="text-4xl font-bold text-foreground mb-2">Blog Management</h1>
-            <p className="text-muted-foreground">Manage your blog posts and engagement</p>
-          </div>
-          <div className="flex items-center gap-2">
-            <Button variant="outline" onClick={handleLogout}>
-              <LogOut className="mr-2 h-4 w-4" />
-              Logout
-            </Button>
-            <Link href="/admin/blogs/new">
-              <Button>
-                <Plus className="mr-2 h-4 w-4" />
-                New Blog
+        <div className="flex flex-col gap-4 mb-8">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+            <div>
+              <h1 className="text-4xl font-bold text-foreground mb-2">Blog Management</h1>
+              <p className="text-muted-foreground">
+                View, filter, and manage all blog posts from a single dashboard.
+              </p>
+            </div>
+            <div className="flex items-center gap-2 w-auto">
+              <Button variant="outline" onClick={handleLogout}>
+                <LogOut className="mr-2 h-4 w-4" />
+                Logout
               </Button>
-            </Link>
+              <Link href="/admin/blogs/new">
+                <Button>
+                  <Plus className="mr-2 h-4 w-4" />
+                  New Blog
+                </Button>
+              </Link>
+            </div>
           </div>
+          <Separator className="opacity-70" />
         </div>
 
-        {/* Search */}
-        <div className="mb-6">
-          <div className="relative max-w-md">
+        {/* Search & Filters */}
+        <div className="flex flex-col md:flex-row justify-between gap-4 mb-6">
+          <div className="relative w-full md:max-w-lg">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
               type="text"
-              placeholder="Search blogs..."
+              placeholder="Search by title, author, or content..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="pl-10"
             />
           </div>
+
+          <div className="flex flex-wrap items-center gap-3 justify-between md:justify-end w-full md:w-auto">
+            <ToggleGroup
+              type="single"
+              value={statusFilter}
+              onValueChange={(value) => {
+                if (value) setStatusFilter(value)
+              }}
+              variant="outline"
+              className="shrink-0"
+            >
+              <ToggleGroupItem value="all" aria-label="Show all blogs">
+                All
+              </ToggleGroupItem>
+              <ToggleGroupItem value="published" aria-label="Show published blogs">
+                Published
+              </ToggleGroupItem>
+              <ToggleGroupItem value="draft" aria-label="Show draft blogs">
+                Drafts
+              </ToggleGroupItem>
+            </ToggleGroup>
+
+            <div className="text-right">
+              <span className="text-xs sm:text-sm text-muted-foreground whitespace-nowrap">
+                Showing{' '}
+                <span className="font-medium">
+                  {paginatedBlogs.length}/{totalFiltered}
+                </span>{' '}
+                blog{totalFiltered === 1 ? '' : 's'}
+              </span>
+            </div>
+          </div>
         </div>
 
         {/* Blogs List */}
         {loading ? (
-          <div className="space-y-4">
+          <div className="space-y-3 sm:space-y-4">
             {[...Array(5)].map((_, i) => (
               <Card key={i}>
-                <CardContent className="pt-6">
-                  <Skeleton className="h-6 w-3/4 mb-2" />
+                <CardContent className="pt-4 sm:pt-6">
+                  <Skeleton className="h-5 sm:h-6 w-3/4 mb-2" />
                   <Skeleton className="h-4 w-full" />
                 </CardContent>
               </Card>
             ))}
           </div>
-        ) : blogs.length === 0 ? (
+        ) : totalFiltered === 0 ? (
           <Card>
-            <CardContent className="pt-6 text-center py-12">
-              <p className="text-muted-foreground">No blogs found.</p>
+            <CardContent className="pt-6 text-center py-8 sm:py-12">
+              <p className="text-sm sm:text-base text-muted-foreground mb-2">
+                No blogs match your current filters.
+              </p>
+              <p className="text-xs text-muted-foreground">
+                Try adjusting the search term or status filter.
+              </p>
             </CardContent>
           </Card>
         ) : (
-          <div className="space-y-4">
-            {blogs.map((blog) => (
+          <div className="space-y-3 sm:space-y-4">
+            {paginatedBlogs.map((blog) => (
               <Card key={blog._id}>
                 <CardHeader>
-                  <div className="flex items-start justify-between">
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2 mb-2">
-                        <CardTitle className="text-xl">{blog.title}</CardTitle>
+                  <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-start gap-2 mb-2 flex-wrap">
+                        <CardTitle className="text-base sm:text-lg lg:text-xl wrap-break-words">
+                          {blog.title}
+                        </CardTitle>
                         {blog.isPublished ? (
-                          <span className="px-2 py-1 text-xs bg-green-500/20 text-green-600 dark:text-green-400 rounded">
+                          <span className="px-2 py-0.5 text-xs bg-green-500/20 text-green-600 dark:text-green-400 rounded whitespace-nowrap">
                             Published
                           </span>
                         ) : (
-                          <span className="px-2 py-1 text-xs bg-gray-500/20 text-gray-600 dark:text-gray-400 rounded">
+                          <span className="px-2 py-0.5 text-xs bg-gray-500/20 text-gray-600 dark:text-gray-400 rounded whitespace-nowrap">
                             Draft
                           </span>
                         )}
                       </div>
-                      <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
+                      <div className="flex flex-wrap items-center gap-2 sm:gap-3 lg:gap-4 text-xs sm:text-sm text-muted-foreground">
                         <div className="flex items-center gap-1">
-                          <User className="h-4 w-4" />
-                          <span>{blog.author}</span>
+                          <User className="h-3 w-3 sm:h-4 sm:w-4 shrink-0" />
+                          <span className="truncate max-w-[120px] sm:max-w-none">{blog.author}</span>
                         </div>
                         {blog.publishedAt && (
                           <div className="flex items-center gap-1">
-                            <Calendar className="h-4 w-4" />
-                            <span>{format(new Date(blog.publishedAt), 'MMM d, yyyy')}</span>
+                            <Calendar className="h-3 w-3 sm:h-4 sm:w-4 shrink-0" />
+                            <span className="whitespace-nowrap">{format(new Date(blog.publishedAt), 'MMM d, yyyy')}</span>
                           </div>
                         )}
-                        <div className="flex items-center gap-1">
-                          <ThumbsUp className="h-4 w-4" />
-                          <span>{blog.likes?.length || 0}</span>
-                        </div>
-                        <div className="flex items-center gap-1">
-                          <ThumbsDown className="h-4 w-4" />
-                          <span>{blog.dislikes?.length || 0}</span>
-                        </div>
-                        <div className="flex items-center gap-1">
-                          <MessageCircle className="h-4 w-4" />
-                          <span>{blog.comments?.length || 0}</span>
-                        </div>
-                        <div className="flex items-center gap-1">
-                          <Eye className="h-4 w-4" />
-                          <span>{blog.views || 0} views</span>
+                        <div className="flex items-center gap-3 sm:gap-4">
+                          <div className="flex items-center gap-1">
+                            <ThumbsUp className="h-3 w-3 sm:h-4 sm:w-4 shrink-0" />
+                            <span>{blog.likes?.length || 0}</span>
+                          </div>
+                          <div className="flex items-center gap-1">
+                            <ThumbsDown className="h-3 w-3 sm:h-4 sm:w-4 shrink-0" />
+                            <span>{blog.dislikes?.length || 0}</span>
+                          </div>
+                          <div className="flex items-center gap-1">
+                            <MessageCircle className="h-3 w-3 sm:h-4 sm:w-4 shrink-0" />
+                            <span>{blog.comments?.length || 0}</span>
+                          </div>
+                          <div className="flex items-center gap-1">
+                            <Eye className="h-3 w-3 sm:h-4 sm:w-4 shrink-0" />
+                            <span className="whitespace-nowrap">{blog.views || 0}</span>
+                          </div>
                         </div>
                       </div>
                     </div>
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-1 sm:gap-2 justify-end sm:justify-start shrink-0">
                       <Button
                         variant="ghost"
-                        size="icon-sm"
+                        size="icon"
                         onClick={() => handleTogglePublish(blog)}
                         title={blog.isPublished ? 'Unpublish' : 'Publish'}
+                        className="h-8 w-8 sm:h-9 sm:w-9"
                       >
                         {blog.isPublished ? (
-                          <EyeOff className="h-4 w-4" />
+                          <EyeOff className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                         ) : (
-                          <Eye className="h-4 w-4" />
+                          <Eye className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                         )}
                       </Button>
                       <Link href={`/admin/blogs/${blog.slug}`}>
-                        <Button variant="ghost" size="icon-sm" title="Edit">
-                          <Edit className="h-4 w-4" />
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          title="Edit"
+                          className="h-8 w-8 sm:h-9 sm:w-9"
+                        >
+                          <Edit className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                         </Button>
                       </Link>
                       <Button
                         variant="ghost"
-                        size="icon-sm"
+                        size="icon"
                         onClick={() => setDeleteDialog({ open: true, blog })}
                         title="Delete"
+                        className="h-8 w-8 sm:h-9 sm:w-9"
                       >
-                        <Trash2 className="h-4 w-4 text-destructive" />
+                        <Trash2 className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-destructive" />
                       </Button>
                     </div>
                   </div>
                 </CardHeader>
-                {blog.excerpt && (
-                  <CardContent>
-                    <p className="text-sm text-muted-foreground line-clamp-2">{blog.excerpt}</p>
-                  </CardContent>
-                )}
               </Card>
             ))}
+
+            {/* Pagination */}
+            {totalPages > 1 && (
+              <div className="pt-4">
+                <Pagination>
+                  <PaginationContent className="flex-wrap gap-1">
+                    <PaginationItem>
+                      <PaginationPrevious
+                        href="#"
+                        onClick={(e) => {
+                          e.preventDefault()
+                          if (page > 1) {
+                            setPage(page - 1)
+                            window.scrollTo({ top: 0, behavior: 'smooth' })
+                          }
+                        }}
+                        className={`text-xs sm:text-sm ${page === 1 ? 'pointer-events-none opacity-50' : 'cursor-pointer'}`}
+                      />
+                    </PaginationItem>
+
+                    {Array.from({ length: totalPages }, (_, i) => i + 1).map((pageNum) => {
+                      const showPage =
+                        pageNum === 1 ||
+                        pageNum === totalPages ||
+                        (pageNum >= page - 1 && pageNum <= page + 1)
+
+                      if (!showPage) {
+                        if (pageNum === page - 2 || pageNum === page + 2) {
+                          return (
+                            <PaginationItem key={pageNum} className="hidden sm:block">
+                              <PaginationEllipsis />
+                            </PaginationItem>
+                          )
+                        }
+                        return null
+                      }
+
+                      return (
+                        <PaginationItem key={pageNum}>
+                          <PaginationLink
+                            href="#"
+                            onClick={(e) => {
+                              e.preventDefault()
+                              setPage(pageNum)
+                              window.scrollTo({ top: 0, behavior: 'smooth' })
+                            }}
+                            isActive={pageNum === page}
+                            className="cursor-pointer text-xs sm:text-sm"
+                          >
+                            {pageNum}
+                          </PaginationLink>
+                        </PaginationItem>
+                      )
+                    })}
+
+                    <PaginationItem>
+                      <PaginationNext
+                        href="#"
+                        onClick={(e) => {
+                          e.preventDefault()
+                          if (page < totalPages) {
+                            setPage(page + 1)
+                            window.scrollTo({ top: 0, behavior: 'smooth' })
+                          }
+                        }}
+                        className={`text-xs sm:text-sm ${page === totalPages ? 'pointer-events-none opacity-50' : 'cursor-pointer'}`}
+                      />
+                    </PaginationItem>
+                  </PaginationContent>
+                </Pagination>
+              </div>
+            )}
           </div>
         )}
 
