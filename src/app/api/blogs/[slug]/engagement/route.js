@@ -18,7 +18,7 @@ export async function POST(request, { params }) {
       );
     }
 
-    const blog = await Blog.findOne({ slug });
+    const blog = await Blog.findOne({ slug }).select('likes dislikes comments likeCount');
 
     if (!blog) {
       return NextResponse.json(
