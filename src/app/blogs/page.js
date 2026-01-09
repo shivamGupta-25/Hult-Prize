@@ -1,4 +1,5 @@
 import { Separator } from '@/components/ui/separator'
+import { escapeRegex } from '@/lib/utils'
 import connectDB from '@/lib/mongodb'
 import Blog from '@/models/Blog'
 import BlogsView from './BlogsView'
@@ -24,9 +25,10 @@ async function getBlogs(searchParams) {
     const query = { isPublished: true } // Default to published only for the public page
 
     if (search) {
+      const searchRegex = escapeRegex(search)
       query.$or = [
-        { title: { $regex: search, $options: 'i' } },
-        { excerpt: { $regex: search, $options: 'i' } },
+        { title: { $regex: searchRegex, $options: 'i' } },
+        { excerpt: { $regex: searchRegex, $options: 'i' } },
       ]
     }
 

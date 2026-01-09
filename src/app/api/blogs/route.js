@@ -3,6 +3,7 @@ import connectDB from '@/lib/mongodb';
 import Blog from '@/models/Blog';
 import { cookies } from 'next/headers';
 import { verifySession } from '@/lib/auth';
+import { escapeRegex } from '@/lib/utils';
 
 // GET - Fetch all blogs (with optional filtering)
 export async function GET(request) {
@@ -28,10 +29,11 @@ export async function GET(request) {
     }
 
     if (search) {
+      const searchRegex = escapeRegex(search);
       query.$or = [
-        { title: { $regex: search, $options: 'i' } },
-        { excerpt: { $regex: search, $options: 'i' } },
-        { content: { $regex: search, $options: 'i' } },
+        { title: { $regex: searchRegex, $options: 'i' } },
+        { excerpt: { $regex: searchRegex, $options: 'i' } },
+        { content: { $regex: searchRegex, $options: 'i' } },
       ];
     }
 
