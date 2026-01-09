@@ -66,6 +66,10 @@ const BlogSchema = new mongoose.Schema(
       type: [String],
       default: [],
     },
+    likeCount: {
+      type: Number,
+      default: 0,
+    },
     comments: {
       type: [CommentSchema],
       default: [],
@@ -82,6 +86,7 @@ const BlogSchema = new mongoose.Schema(
 
 // Create indexes for better query performance
 BlogSchema.index({ isPublished: 1, publishedAt: -1 });
+BlogSchema.index({ likeCount: -1 });
 BlogSchema.index({ likes: -1 });
 BlogSchema.index({ createdAt: -1 });
 

@@ -53,6 +53,7 @@ export async function POST(request, { params }) {
         }
         blog.dislikes.push(userId);
       }
+
     } else if (action === 'comment') {
       if (!comment || !comment.content || !comment.author) {
         return NextResponse.json(
@@ -73,6 +74,9 @@ export async function POST(request, { params }) {
         { status: 400 }
       );
     }
+
+    // Always update likeCount based on current likes array
+    blog.likeCount = blog.likes.length;
 
     await blog.save();
 

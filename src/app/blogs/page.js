@@ -157,6 +157,9 @@ export default function BlogsPage() {
                 <ToggleGroupItem value="likes" aria-label="Sort by most liked">
                   Most Liked
                 </ToggleGroupItem>
+                <ToggleGroupItem value="views" aria-label="Sort by most viewed">
+                  Most Viewed
+                </ToggleGroupItem>
               </ToggleGroup>
               <div className="hidden sm:flex h-9 border rounded-md overflow-hidden">
                 <Button
