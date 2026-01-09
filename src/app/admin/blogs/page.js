@@ -44,6 +44,7 @@ import {
 } from 'lucide-react'
 import { format } from 'date-fns'
 import { toast } from 'sonner'
+import { Switch } from '@/components/ui/switch'
 
 export default function AdminBlogsPage() {
   const router = useRouter()
@@ -326,19 +327,12 @@ export default function AdminBlogsPage() {
                       </div>
                     </div>
                     <div className="flex items-center gap-1 sm:gap-2 justify-end sm:justify-start shrink-0">
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => handleTogglePublish(blog)}
-                        title={blog.isPublished ? 'Unpublish' : 'Publish'}
-                        className="h-8 w-8 sm:h-9 sm:w-9"
-                      >
-                        {blog.isPublished ? (
-                          <EyeOff className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-                        ) : (
-                          <Eye className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-                        )}
-                      </Button>
+                      <div className="flex items-center gap-2 mr-2" title={blog.isPublished ? 'Unpublish' : 'Publish'}>
+                        <Switch
+                          checked={blog.isPublished}
+                          onCheckedChange={() => handleTogglePublish(blog)}
+                        />
+                      </div>
                       <Link href={`/admin/blogs/${blog.slug}`}>
                         <Button
                           variant="ghost"

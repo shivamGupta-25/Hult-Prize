@@ -21,6 +21,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
+import { Switch } from '@/components/ui/switch'
 import {
   ArrowLeft,
   Save,
@@ -67,7 +68,7 @@ export default function EditBlogPage() {
     try {
       const response = await fetch(`/api/blogs/${slug}`)
       const data = await response.json()
-      
+
       if (response.ok) {
         setFormData({
           title: data.title || '',
@@ -94,7 +95,7 @@ export default function EditBlogPage() {
     try {
       const response = await fetch(`/api/blogs/${slug}/engagement?isAdmin=true`)
       const data = await response.json()
-      
+
       if (response.ok) {
         setEngagement({
           likes: data.likes || 0,
@@ -159,14 +160,14 @@ export default function EditBlogPage() {
     const reader = new FileReader()
     reader.onloadend = async () => {
       const base64String = reader.result
-      
+
       try {
         const response = await fetch('/api/images/upload', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ image: base64String }),
         })
-        
+
         const data = await response.json()
         if (data.url) {
           setFormData(prev => ({ ...prev, posterImage: data.url }))
@@ -322,12 +323,10 @@ export default function EditBlogPage() {
                   </div>
 
                   <div className="flex items-center gap-2">
-                    <input
-                      type="checkbox"
+                    <Switch
                       id="isPublished"
                       checked={formData.isPublished}
-                      onChange={(e) => setFormData(prev => ({ ...prev, isPublished: e.target.checked }))}
-                      className="rounded"
+                      onCheckedChange={(checked) => setFormData(prev => ({ ...prev, isPublished: checked }))}
                     />
                     <Label htmlFor="isPublished" className="cursor-pointer">
                       Published
@@ -390,6 +389,7 @@ export default function EditBlogPage() {
                             <p className="text-sm">{comment.content}</p>
                             <div className="flex gap-2">
                               <Button
+                                type="button"
                                 size="sm"
                                 variant="outline"
                                 onClick={() => handleCommentToggle(comment._id, !comment.isApproved)}
@@ -397,6 +397,7 @@ export default function EditBlogPage() {
                                 {comment.isApproved ? 'Unapprove' : 'Approve'}
                               </Button>
                               <Button
+                                type="button"
                                 size="sm"
                                 variant="destructive"
                                 onClick={() => handleDeleteComment(comment._id)}
@@ -495,6 +496,7 @@ export default function EditBlogPage() {
                         <p className="text-sm">{comment.content}</p>
                         <div className="flex gap-2">
                           <Button
+                            type="button"
                             size="sm"
                             variant="outline"
                             onClick={() => handleCommentToggle(comment._id, !comment.isApproved)}
@@ -502,6 +504,7 @@ export default function EditBlogPage() {
                             {comment.isApproved ? 'Unapprove' : 'Approve'}
                           </Button>
                           <Button
+                            type="button"
                             size="sm"
                             variant="destructive"
                             onClick={() => handleDeleteComment(comment._id)}

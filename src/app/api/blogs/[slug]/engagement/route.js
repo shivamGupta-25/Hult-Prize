@@ -125,7 +125,7 @@ export async function GET(request, { params }) {
 
     // Include all comments for admins (including unapproved)
     if (isAdmin) {
-      response.allComments = blog.comments;
+      response.allComments = blog.comments.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
     }
 
     return NextResponse.json(response);

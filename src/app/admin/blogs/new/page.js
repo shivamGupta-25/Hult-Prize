@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
+import { Switch } from '@/components/ui/switch'
 import BlogEditor from '@/components/BlogEditor'
 import { ArrowLeft, Save, Eye } from 'lucide-react'
 import Link from 'next/link'
@@ -181,12 +182,10 @@ export default function NewBlogPage() {
               </div>
 
               <div className="flex items-center gap-2">
-                <input
-                  type="checkbox"
+                <Switch
                   id="isPublished"
                   checked={formData.isPublished}
-                  onChange={(e) => setFormData(prev => ({ ...prev, isPublished: e.target.checked }))}
-                  className="rounded"
+                  onCheckedChange={(checked) => setFormData(prev => ({ ...prev, isPublished: checked }))}
                 />
                 <Label htmlFor="isPublished" className="cursor-pointer">
                   Publish immediately

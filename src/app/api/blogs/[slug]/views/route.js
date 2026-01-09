@@ -30,7 +30,7 @@ export async function POST(request, { params }) {
     const now = Date.now();
     const lastViewed = viewedBlogs[slug];
 
-    // Check if this blog was viewed recently (within 30 minutes)
+    // Check if this blog was viewed recently (within 7 days)
     if (lastViewed && (now - lastViewed) < VIEW_EXPIRY_MS) {
       // Don't increment, just return current count
       const blog = await Blog.findOne({ slug }).select('views');
@@ -65,7 +65,7 @@ export async function POST(request, { params }) {
     // Update cookie with new timestamp
     viewedBlogs[slug] = now;
 
-    // Clean up old entries (older than 30 minutes)
+    // Clean up old entries (older than 7 days  )
     Object.keys(viewedBlogs).forEach(key => {
       if (now - viewedBlogs[key] > VIEW_EXPIRY_MS) {
         delete viewedBlogs[key];
