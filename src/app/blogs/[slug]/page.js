@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useParams } from 'next/navigation'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -42,6 +42,7 @@ export default function BlogDetailPage() {
   const [commentAuthor, setCommentAuthor] = useState('')
   const [submittingComment, setSubmittingComment] = useState(false)
   const [copied, setCopied] = useState(false)
+  const viewIncrementedRef = useRef(false)
 
   // Generate a simple user ID (in production, use proper auth)
   const userId = typeof window !== 'undefined' ? localStorage.getItem('userId') || `user_${Date.now()}` : `user_${Date.now()}`
@@ -54,6 +55,7 @@ export default function BlogDetailPage() {
 
   useEffect(() => {
     if (slug) {
+      viewIncrementedRef.current = false // Reset on slug change
       fetchBlog()
       fetchEngagement()
       fetchRecommendedBlogs()
@@ -68,6 +70,8 @@ export default function BlogDetailPage() {
 
       if (response.ok) {
         setBlog(data)
+        // Increment view count after successful fetch
+        incrementView()
       } else {
         toast.error('Blog not found')
       }
@@ -76,6 +80,27 @@ export default function BlogDetailPage() {
       toast.error('Failed to load blog')
     } finally {
       setLoading(false)
+    }
+  }
+
+  const incrementView = async () => {
+    // Prevent duplicate increments
+    if (viewIncrementedRef.current) return
+    viewIncrementedRef.current = true
+
+    try {
+      const response = await fetch(`/api/blogs/${slug}/views`, {
+        method: 'POST',
+      })
+      const data = await response.json()
+
+      if (response.ok && data.views !== undefined) {
+        // Update the blog state with the new view count
+        setBlog(prev => prev ? { ...prev, views: data.views } : null)
+      }
+    } catch (error) {
+      console.error('Error incrementing view:', error)
+      // Don't show error to user, this is a background operation
     }
   }
 

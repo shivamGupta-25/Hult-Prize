@@ -9,7 +9,7 @@ export async function GET(request, { params }) {
 
     const { slug } = await params;
 
-    const blog = await Blog.findOne({ slug }).lean();
+    const blog = await Blog.findOne({ slug });
 
     if (!blog) {
       return NextResponse.json(
@@ -17,10 +17,6 @@ export async function GET(request, { params }) {
         { status: 404 }
       );
     }
-
-    // Increment views
-    await Blog.findByIdAndUpdate(blog._id, { $inc: { views: 1 } });
-    blog.views = (blog.views || 0) + 1;
 
     return NextResponse.json(blog);
   } catch (error) {
