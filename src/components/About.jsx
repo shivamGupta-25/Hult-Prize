@@ -91,7 +91,7 @@ export const About = () => {
 
         {/* Flagship Event Card */}
         <div className="relative mt-8 sm:mt-12 md:mt-16">
-          <Card className="border-l-4 border-l-primary bg-linear-to-br from-primary/5 via-primary/3 to-background shadow-xl hover:shadow-2xl transition-all duration-300 relative overflow-hidden">
+          <Card className="border-l-4 border-l-primary bg-linear-to-br from-primary/5 via-primary/3 to-background shadow-lg hover:shadow-xl transition-all duration-300 relative overflow-hidden">
             {/* Decorative Quote Icon */}
             <div
               className="absolute -top-2 -left-2 sm:-top-4 sm:-left-4 opacity-5 md:opacity-10"
