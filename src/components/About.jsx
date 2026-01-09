@@ -36,12 +36,6 @@ export const About = () => {
 
         {/* Main Content */}
         <div className="relative text-justify">
-          {/* Decorative Background Elements */}
-          <div className="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden="true">
-            <div className="absolute top-0 right-0 w-48 h-48 sm:w-64 sm:h-64 bg-primary/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
-            <div className="absolute bottom-0 left-0 w-48 h-48 sm:w-64 sm:h-64 bg-primary/5 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2" />
-          </div>
-
           <div className="relative z-10">
             {/* Icon Features */}
             <div className="flex items-center justify-center gap-4 sm:gap-6 md:gap-12 mb-6 sm:mb-8 md:mb-12">

@@ -556,6 +556,3 @@ export default function EditBlogPage() {
     </div>
   )
 }
-
-
-

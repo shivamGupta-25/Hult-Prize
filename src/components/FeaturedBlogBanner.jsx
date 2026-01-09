@@ -76,9 +76,6 @@ export const FeaturedBlogBanner = async () => {
                     className="object-cover transition-transform duration-700 group-hover:scale-105"
                     priority
                   />
-                  {/* Overlay for mobile/tablet text readability if needed, but we used split layout. 
-                      Adding a subtle gradient anyway for style */}
-                  <div className="absolute inset-0 bg-linear-to-bl from-transparent via-transparent to-background/20 lg:to-transparent" />
                 </>
               ) : (
                 <div className="absolute inset-0 bg-secondary flex items-center justify-center text-muted-foreground">

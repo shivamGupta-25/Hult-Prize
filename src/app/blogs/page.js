@@ -8,9 +8,6 @@ export const metadata = {
   description: 'Discover insights, stories, and updates from the Hult Prize community',
 }
 
-// getBlogs logic is now handled by src/services/blogService.js
-
-
 export default async function BlogsPage({ searchParams }) {
   const resolvedSearchParams = await searchParams
 

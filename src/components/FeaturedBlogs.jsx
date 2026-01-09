@@ -7,6 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { ThumbsUp, Eye, Sparkles, Calendar, User, ArrowRight } from 'lucide-react';
 import { format } from 'date-fns';
 import { getFeaturedBlogs } from '@/services/blogService';
+import FeaturedBlogBanner from '@/components/FeaturedBlogBanner';
 
 const CategoryBadge = ({ type, icon: Icon }) => {
   const badges = {
@@ -52,24 +53,18 @@ export const FeaturedBlogs = async () => {
 
   return (
     <section className="w-full py-12 px-4 sm:px-6 lg:px-8 bg-background relative overflow-hidden">
-      {/* Decorative Background Elements */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden="true">
-        <div className="absolute top-0 left-1/4 w-64 h-64 bg-primary/5 rounded-full blur-3xl" />
-        <div className="absolute bottom-0 right-1/4 w-64 h-64 bg-primary/5 rounded-full blur-3xl" />
-      </div>
-
       <div className="max-w-7xl mx-auto relative z-10">
-        {/* Header */}
-        <header className="text-center space-y-3 sm:space-y-4 mb-8 sm:mb-12">
-          <h2 className="text-3xl font-bold tracking-tight sm:text-4xl md:text-5xl text-foreground">
-            Blogs
-          </h2>
+        <h2 className="text-center mb-8 sm:mb-12 text-3xl font-bold tracking-tight sm:text-4xl md:text-5xl text-foreground">
+          Featured Blogs
+        </h2>
+        <Separator className="w-20 sm:w-24 mx-auto bg-primary/30" />
+        <FeaturedBlogBanner />
+        <div className="text-center space-y-3 sm:space-y-4 mb-8 sm:mb-12">
           <Separator className="w-20 sm:w-24 mx-auto bg-primary/30" />
           <p className="text-muted-foreground text-base sm:text-lg max-w-2xl mx-auto">
             Discover our most popular and latest stories from the community
           </p>
-        </header>
-
+        </div>
         {/* Blog Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
           {blogEntries.map(({ key, blog, type, icon }) => {
