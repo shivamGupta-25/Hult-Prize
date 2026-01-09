@@ -30,6 +30,7 @@ import {
 } from 'lucide-react'
 import { format } from 'date-fns'
 import { toast } from 'sonner'
+import DOMPurify from 'isomorphic-dompurify'
 
 export default function BlogDetailPage() {
   const params = useParams()
@@ -311,7 +312,7 @@ export default function BlogDetailPage() {
           {/* Content */}
           <div
             className="prose prose-lg max-w-none dark:prose-invert mb-12"
-            dangerouslySetInnerHTML={{ __html: blog.content }}
+            dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(blog.content) }}
           />
 
           {/* Engagement Section */}

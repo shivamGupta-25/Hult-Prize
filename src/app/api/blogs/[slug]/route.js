@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import Blog from '@/models/Blog';
+import { cookies } from 'next/headers';
+import { verifySession } from '@/lib/auth';
 
 // GET - Fetch a single blog by slug
 export async function GET(request, { params }) {
@@ -18,6 +20,20 @@ export async function GET(request, { params }) {
       );
     }
 
+    // Check if blog is published or if user is admin
+    if (!blog.isPublished) {
+      const cookieStore = await cookies();
+      const token = cookieStore.get('admin-session')?.value;
+      const isVerified = await verifySession(token);
+
+      if (!isVerified) {
+        return NextResponse.json(
+          { error: 'Unauthorized' },
+          { status: 401 }
+        );
+      }
+    }
+
     return NextResponse.json(blog);
   } catch (error) {
     console.error('Error fetching blog:', error);
@@ -31,6 +47,17 @@ export async function GET(request, { params }) {
 // PUT - Update a blog
 export async function PUT(request, { params }) {
   try {
+    const cookieStore = await cookies();
+    const token = cookieStore.get('admin-session')?.value;
+    const isVerified = await verifySession(token);
+
+    if (!isVerified) {
+      return NextResponse.json(
+        { error: 'Unauthorized' },
+        { status: 401 }
+      );
+    }
+
     await connectDB();
 
     const { slug } = await params;
@@ -89,6 +116,17 @@ export async function PUT(request, { params }) {
 // DELETE - Delete a blog
 export async function DELETE(request, { params }) {
   try {
+    const cookieStore = await cookies();
+    const token = cookieStore.get('admin-session')?.value;
+    const isVerified = await verifySession(token);
+
+    if (!isVerified) {
+      return NextResponse.json(
+        { error: 'Unauthorized' },
+        { status: 401 }
+      );
+    }
+
     await connectDB();
 
     const { slug } = await params;

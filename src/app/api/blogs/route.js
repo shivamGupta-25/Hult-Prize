@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import Blog from '@/models/Blog';
+import { cookies } from 'next/headers';
+import { verifySession } from '@/lib/auth';
 
 // GET - Fetch all blogs (with optional filtering)
 export async function GET(request) {
@@ -71,6 +73,17 @@ export async function GET(request) {
 // POST - Create a new blog
 export async function POST(request) {
   try {
+    const cookieStore = await cookies();
+    const token = cookieStore.get('admin-session')?.value;
+    const isVerified = await verifySession(token);
+
+    if (!isVerified) {
+      return NextResponse.json(
+        { error: 'Unauthorized' },
+        { status: 401 }
+      );
+    }
+
     await connectDB();
 
     const body = await request.json();
