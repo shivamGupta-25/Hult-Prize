@@ -208,7 +208,7 @@ function serializeBlog(blog) {
     publishedAt: blog.publishedAt?.toISOString(),
     likes: blog.likes?.map(id => id.toString()) || [],
     dislikes: blog.dislikes?.map(id => id.toString()) || [],
-    comments: blog.comments?.map(comment => ({
+    comments: blog.comments?.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).map(comment => ({
       ...comment,
       _id: comment._id?.toString(),
       createdAt: comment.createdAt?.toISOString()

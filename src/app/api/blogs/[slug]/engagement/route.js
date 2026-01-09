@@ -83,7 +83,7 @@ export async function POST(request, { params }) {
     return NextResponse.json({
       likes: blog.likes.length,
       dislikes: blog.dislikes.length,
-      comments: blog.comments.filter(c => c.isApproved),
+      comments: blog.comments.filter(c => c.isApproved).sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)),
       userLiked: blog.likes.includes(userId),
       userDisliked: blog.dislikes.includes(userId),
     });
@@ -118,7 +118,7 @@ export async function GET(request, { params }) {
     const response = {
       likes: blog.likes.length,
       dislikes: isAdmin ? blog.dislikes.length : undefined, // Hide from non-admins
-      comments: blog.comments.filter(c => c.isApproved),
+      comments: blog.comments.filter(c => c.isApproved).sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)),
       userLiked: userId ? blog.likes.includes(userId) : false,
       userDisliked: userId ? blog.dislikes.includes(userId) : false,
     };
