@@ -3,13 +3,12 @@ import connectDB from '@/lib/mongodb';
 import Blog from '@/models/Blog';
 import { cookies } from 'next/headers';
 import { verifySession } from '@/lib/auth';
-import { escapeRegex } from '@/lib/utils';
+import { getBlogs } from '@/services/blogService';
+
 
 // GET - Fetch all blogs (with optional filtering)
 export async function GET(request) {
   try {
-    await connectDB();
-
     const { searchParams } = new URL(request.url);
     const page = parseInt(searchParams.get('page') || '1');
     const limit = parseInt(searchParams.get('limit') || '10');
@@ -18,51 +17,21 @@ export async function GET(request) {
     const order = searchParams.get('order') || 'desc';
     const search = searchParams.get('search') || '';
 
-    const skip = (page - 1) * limit;
+    // Convert 'published' string to boolean or undefined
+    let isPublished;
+    if (published === 'true') isPublished = true;
+    if (published === 'false') isPublished = false;
 
-    // Build query
-    const query = {};
-
-    // Only filter by published status if a specific value is provided
-    if (published !== null && published !== undefined && published !== '') {
-      query.isPublished = published === 'true';
-    }
-
-    if (search) {
-      const searchRegex = escapeRegex(search);
-      query.$or = [
-        { title: { $regex: searchRegex, $options: 'i' } },
-        { excerpt: { $regex: searchRegex, $options: 'i' } },
-        { content: { $regex: searchRegex, $options: 'i' } },
-      ];
-    }
-
-    // Build sort object
-    const sort = {};
-    if (sortBy === 'likes') {
-      sort['likeCount'] = order === 'asc' ? 1 : -1;
-    } else {
-      sort[sortBy] = order === 'asc' ? 1 : -1;
-    }
-
-    const blogs = await Blog.find(query)
-      .sort(sort)
-      .skip(skip)
-      .limit(limit)
-      .select('-content') // Exclude full content from listing
-      .lean();
-
-    const total = await Blog.countDocuments(query);
-
-    return NextResponse.json({
-      blogs,
-      pagination: {
-        page,
-        limit,
-        total,
-        pages: Math.ceil(total / limit),
-      },
+    const result = await getBlogs({
+      page,
+      limit,
+      published: isPublished,
+      sortBy,
+      order,
+      search
     });
+
+    return NextResponse.json(result);
   } catch (error) {
     console.error('Error fetching blogs:', error);
     return NextResponse.json(
@@ -71,6 +40,7 @@ export async function GET(request) {
     );
   }
 }
+
 
 // POST - Create a new blog
 export async function POST(request) {

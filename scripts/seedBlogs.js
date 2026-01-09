@@ -10,23 +10,33 @@ const CommentSchema = new mongoose.Schema({
   isApproved: { type: Boolean, default: true },
 });
 
+// Use dynamic import for ESM compatibility or ensure this script is run with support.
+// Since we are in a Next.js environment, it's safer to keep the schema definition here for a standalone script
+// unless we change this to a module.
+// However, I will update the schema definition to match the source EXACTLY.
 const BlogSchema = new mongoose.Schema({
   title: { type: String, required: true },
   slug: { type: String, unique: true, required: true },
   excerpt: { type: String, required: true },
   content: { type: String, required: true },
-  posterImage: String,
+  posterImage: { type: String, default: '' },
   author: { type: String, required: true },
-  isPublished: { type: Boolean, default: true },
+  isPublished: { type: Boolean, default: false },
   publishedAt: Date,
-  likes: [String],
+  likes: { type: [String], default: [] },
   likeCount: { type: Number, default: 0 },
-  dislikes: [String],
-  comments: [CommentSchema],
+  dislikes: { type: [String], default: [] },
+  comments: { type: [CommentSchema], default: [] },
   views: { type: Number, default: 0 },
 }, {
   timestamps: true
 });
+
+// Add indexes as per actual model
+BlogSchema.index({ isPublished: 1, publishedAt: -1 });
+BlogSchema.index({ likeCount: -1 });
+BlogSchema.index({ likes: -1 });
+BlogSchema.index({ createdAt: -1 });
 
 const Blog = mongoose.models.Blog || mongoose.model('Blog', BlogSchema);
 

@@ -1,15 +1,12 @@
-'use client';
-
-import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
-import { Skeleton } from '@/components/ui/skeleton';
 import { Badge } from '@/components/ui/badge';
 import { ThumbsUp, Eye, Sparkles, Calendar, User, ArrowRight } from 'lucide-react';
 import { format } from 'date-fns';
+import { getFeaturedBlogs } from '@/services/blogService';
 
 const CategoryBadge = ({ type, icon: Icon }) => {
   const badges = {
@@ -17,18 +14,14 @@ const CategoryBadge = ({ type, icon: Icon }) => {
       label: 'Most Liked',
       className: 'bg-rose-100 dark:bg-rose-950 border-rose-300 dark:border-rose-700 text-rose-700 dark:text-rose-300',
     },
-
     viewed: {
       label: 'Most Viewed',
       className: 'bg-blue-100 dark:bg-blue-950 border-blue-300 dark:border-blue-700 text-blue-700 dark:text-blue-300',
     },
-
     latest: {
       label: 'Latest',
       className: 'bg-purple-100 dark:bg-purple-950 border-purple-300 dark:border-purple-700 text-purple-700 dark:text-purple-300',
     },
-
-
   };
 
   const badge = badges[type];
@@ -41,56 +34,8 @@ const CategoryBadge = ({ type, icon: Icon }) => {
   );
 };
 
-const BlogCardSkeleton = () => (
-  <Card className="h-full overflow-hidden pt-0">
-    <Skeleton className="h-52 w-full" />
-    <CardHeader className="px-5">
-      <Skeleton className="h-6 w-32 mb-3" />
-      <Skeleton className="h-6 w-3/4 mb-2" />
-      <Skeleton className="h-4 w-full" />
-      <Skeleton className="h-4 w-2/3" />
-    </CardHeader>
-    <CardContent className="px-5">
-      <Skeleton className="h-4 w-full" />
-    </CardContent>
-  </Card>
-);
-
-export const FeaturedBlogs = () => {
-  const [blogs, setBlogs] = useState({ liked: null, viewed: null, latest: null });
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    fetchFeaturedBlogs();
-  }, []);
-
-  const fetchFeaturedBlogs = async () => {
-    setLoading(true);
-    try {
-      // Fetch all three categories in parallel
-      const [likedRes, viewedRes, latestRes] = await Promise.all([
-        fetch('/api/blogs?published=true&sortBy=likes&order=desc&limit=1'),
-        fetch('/api/blogs?published=true&sortBy=views&order=desc&limit=1'),
-        fetch('/api/blogs?published=true&sortBy=publishedAt&order=desc&limit=1'),
-      ]);
-
-      const [likedData, viewedData, latestData] = await Promise.all([
-        likedRes.json(),
-        viewedRes.json(),
-        latestRes.json(),
-      ]);
-
-      setBlogs({
-        liked: likedData.blogs?.[0] || null,
-        viewed: viewedData.blogs?.[0] || null,
-        latest: latestData.blogs?.[0] || null,
-      });
-    } catch (error) {
-      console.error('Error fetching featured blogs:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
+export const FeaturedBlogs = async () => {
+  const blogs = await getFeaturedBlogs();
 
   const blogEntries = [
     { key: 'liked', blog: blogs.liked, type: 'liked', icon: ThumbsUp },
@@ -101,8 +46,8 @@ export const FeaturedBlogs = () => {
   // Check if we have at least one blog to display
   const hasBlogs = blogEntries.some(entry => entry.blog);
 
-  if (!loading && !hasBlogs) {
-    return null; // Don't render section if no blogs available
+  if (!hasBlogs) {
+    return null;
   }
 
   return (
@@ -127,100 +72,92 @@ export const FeaturedBlogs = () => {
 
         {/* Blog Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-          {loading ? (
-            <>
-              <BlogCardSkeleton />
-              <BlogCardSkeleton />
-              <BlogCardSkeleton />
-            </>
-          ) : (
-            blogEntries.map(({ key, blog, type, icon }) => {
-              if (!blog) return null;
+          {blogEntries.map(({ key, blog, type, icon }) => {
+            if (!blog) return null;
 
-              return (
-                <Link key={key} href={`/blogs/${blog.slug}`}>
-                  <Card className="pt-0 h-full hover:shadow-xl transition-all duration-500 cursor-pointer group overflow-hidden border-border/50 hover:border-primary/30 relative">
-                    {/* Category Badge - Positioned absolutely */}
-                    <div className="absolute top-4 left-4 z-20">
-                      <CategoryBadge type={type} icon={icon} />
+            return (
+              <Link key={key} href={`/blogs/${blog.slug}`}>
+                <Card className="pt-0 h-full hover:shadow-xl transition-all duration-500 cursor-pointer group overflow-hidden border-border/50 hover:border-primary/30 relative">
+                  {/* Category Badge - Positioned absolutely */}
+                  <div className="absolute top-4 left-4 z-20">
+                    <CategoryBadge type={type} icon={icon} />
+                  </div>
+
+                  {/* Poster Image */}
+                  {blog.posterImage && (
+                    <div className="relative h-52 w-full overflow-hidden">
+                      <Image
+                        src={blog.posterImage}
+                        alt={blog.title}
+                        fill
+                        className="object-cover group-hover:scale-110 transition-transform duration-500"
+                      />
+                      {/* Gradient Overlay */}
+                      <div className="absolute inset-0 bg-linear-to-t from-black/60 via-black/20 to-transparent" />
+                    </div>
+                  )}
+
+                  <CardHeader className="px-5 pb-3">
+                    <CardTitle className="line-clamp-2 group-hover:text-primary transition-colors text-lg mb-2 leading-tight">
+                      {blog.title}
+                    </CardTitle>
+                    {blog.excerpt && (
+                      <CardDescription className="line-clamp-3 text-sm leading-relaxed">
+                        {blog.excerpt}
+                      </CardDescription>
+                    )}
+                  </CardHeader>
+
+                  <CardContent className="px-5 pt-0 pb-5">
+                    {/* Metadata */}
+                    <div className="flex items-center gap-3 text-xs text-muted-foreground mb-4 pb-4 border-b border-border/50">
+                      <div className="flex items-center gap-1.5">
+                        <User className="h-3.5 w-3.5" />
+                        <span className="truncate max-w-[100px]">{blog.author}</span>
+                      </div>
+                      {blog.publishedAt && (
+                        <>
+                          <span className="text-muted-foreground/50">•</span>
+                          <div className="flex items-center gap-1.5">
+                            <Calendar className="h-3.5 w-3.5 shrink-0" />
+                            <span className="whitespace-nowrap">
+                              {format(new Date(blog.publishedAt), 'MMM d, yyyy')}
+                            </span>
+                          </div>
+                        </>
+                      )}
                     </div>
 
-                    {/* Poster Image */}
-                    {blog.posterImage && (
-                      <div className="relative h-52 w-full overflow-hidden">
-                        <Image
-                          src={blog.posterImage}
-                          alt={blog.title}
-                          fill
-                          className="object-cover group-hover:scale-110 transition-transform duration-500"
-                        />
-                        {/* Gradient Overlay */}
-                        <div className="absolute inset-0 bg-linear-to-t from-black/60 via-black/20 to-transparent" />
-                      </div>
-                    )}
-
-                    <CardHeader className="px-5 pb-3">
-                      <CardTitle className="line-clamp-2 group-hover:text-primary transition-colors text-lg mb-2 leading-tight">
-                        {blog.title}
-                      </CardTitle>
-                      {blog.excerpt && (
-                        <CardDescription className="line-clamp-3 text-sm leading-relaxed">
-                          {blog.excerpt}
-                        </CardDescription>
-                      )}
-                    </CardHeader>
-
-                    <CardContent className="px-5 pt-0 pb-5">
-                      {/* Metadata */}
-                      <div className="flex items-center gap-3 text-xs text-muted-foreground mb-4 pb-4 border-b border-border/50">
+                    {/* Stats and CTA */}
+                    <div className="flex items-center justify-between gap-3">
+                      <div className="flex items-center gap-4 text-xs text-muted-foreground">
                         <div className="flex items-center gap-1.5">
-                          <User className="h-3.5 w-3.5" />
-                          <span className="truncate max-w-[100px]">{blog.author}</span>
+                          <ThumbsUp className="h-3.5 w-3.5" />
+                          <span className="font-medium">{blog.likes?.length || 0}</span>
                         </div>
-                        {blog.publishedAt && (
-                          <>
-                            <span className="text-muted-foreground/50">•</span>
-                            <div className="flex items-center gap-1.5">
-                              <Calendar className="h-3.5 w-3.5 shrink-0" />
-                              <span className="whitespace-nowrap">
-                                {format(new Date(blog.publishedAt), 'MMM d, yyyy')}
-                              </span>
-                            </div>
-                          </>
-                        )}
-                      </div>
-
-                      {/* Stats and CTA */}
-                      <div className="flex items-center justify-between gap-3">
-                        <div className="flex items-center gap-4 text-xs text-muted-foreground">
-                          <div className="flex items-center gap-1.5">
-                            <ThumbsUp className="h-3.5 w-3.5" />
-                            <span className="font-medium">{blog.likes?.length || 0}</span>
-                          </div>
-                          <div className="flex items-center gap-1.5">
-                            <Eye className="h-3.5 w-3.5" />
-                            <span className="font-medium">{blog.views || 0}</span>
-                          </div>
+                        <div className="flex items-center gap-1.5">
+                          <Eye className="h-3.5 w-3.5" />
+                          <span className="font-medium">{blog.views || 0}</span>
                         </div>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          className="group-hover:text-primary h-8 text-xs font-semibold"
-                        >
-                          Read
-                          <ArrowRight className="ml-1.5 h-3.5 w-3.5 group-hover:translate-x-1 transition-transform" />
-                        </Button>
                       </div>
-                    </CardContent>
-                  </Card>
-                </Link>
-              );
-            })
-          )}
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="group-hover:text-primary h-8 text-xs font-semibold"
+                      >
+                        Read
+                        <ArrowRight className="ml-1.5 h-3.5 w-3.5 group-hover:translate-x-1 transition-transform" />
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              </Link>
+            );
+          })}
         </div>
 
         {/* View All Button */}
-        {!loading && hasBlogs && (
+        {hasBlogs && (
           <div className="flex justify-center">
             <Link href="/blogs">
               <Button
@@ -243,3 +180,4 @@ export const FeaturedBlogs = () => {
 };
 
 export default FeaturedBlogs;
+

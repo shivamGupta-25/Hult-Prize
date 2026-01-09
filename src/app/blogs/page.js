@@ -1,85 +1,27 @@
 import { Separator } from '@/components/ui/separator'
-import { escapeRegex } from '@/lib/utils'
-import connectDB from '@/lib/mongodb'
-import Blog from '@/models/Blog'
 import BlogsView from './BlogsView'
+import { getBlogs } from '@/services/blogService'
 
 export const metadata = {
   title: 'Blog | Hult Prize',
   description: 'Discover insights, stories, and updates from the Hult Prize community',
 }
 
-async function getBlogs(searchParams) {
-  try {
-    await connectDB()
+// getBlogs logic is now handled by src/services/blogService.js
 
-    const page = parseInt(searchParams.page || '1')
-    const limit = 9 // Adjusted to 9 to match the UI grid
-    const sortBy = searchParams.sortBy || 'publishedAt'
-    const order = 'desc'
-    const search = searchParams.search || ''
-
-    const skip = (page - 1) * limit
-
-    // Build query
-    const query = { isPublished: true } // Default to published only for the public page
-
-    if (search) {
-      const searchRegex = escapeRegex(search)
-      query.$or = [
-        { title: { $regex: searchRegex, $options: 'i' } },
-        { excerpt: { $regex: searchRegex, $options: 'i' } },
-      ]
-    }
-
-    // Build sort object
-    const sort = {}
-    if (sortBy === 'likes') {
-      sort['likeCount'] = order === 'asc' ? 1 : -1
-    } else {
-      sort[sortBy] = order === 'asc' ? 1 : -1
-    }
-
-    const blogs = await Blog.find(query)
-      .sort(sort)
-      .skip(skip)
-      .limit(limit)
-      .select('title slug excerpt posterImage author publishedAt likes views') // Select only needed fields
-      .lean()
-
-    const total = await Blog.countDocuments(query)
-
-    // Serialize MongoDB objects (convert OID and Dates to strings)
-    const serializedBlogs = blogs.map(blog => ({
-      ...blog,
-      _id: blog._id.toString(),
-      publishedAt: blog.publishedAt?.toISOString(),
-      likes: blog.likes?.map(id => id.toString()) || [],
-      // Ensure views is a number
-      views: blog.views || 0
-    }))
-
-    return {
-      blogs: serializedBlogs,
-      pagination: {
-        page,
-        limit,
-        total,
-        pages: Math.ceil(total / limit),
-      },
-    }
-  } catch (error) {
-    console.error('Error fetching blogs:', error)
-    return {
-      blogs: [],
-      pagination: { page: 1, limit: 10, total: 0, pages: 0 },
-    }
-  }
-}
 
 export default async function BlogsPage({ searchParams }) {
   const resolvedSearchParams = await searchParams
-  const { blogs, pagination } = await getBlogs(resolvedSearchParams)
+
+  // Use service to fetch blogs
+  const { blogs, pagination } = await getBlogs({
+    page: parseInt(resolvedSearchParams.page || '1'),
+    limit: 9,
+    search: resolvedSearchParams.search || '',
+    sortBy: resolvedSearchParams.sortBy || 'publishedAt',
+    order: 'desc',
+    published: true // Always valid for public page
+  });
 
   return (
     <div className="min-h-screen bg-background">

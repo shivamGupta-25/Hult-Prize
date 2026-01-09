@@ -1,17 +1,17 @@
 import { NextResponse } from 'next/server';
-import connectDB from '@/lib/mongodb';
-import Blog from '@/models/Blog';
 import { cookies } from 'next/headers';
 import { verifySession } from '@/lib/auth';
+import { getBlogBySlug } from '@/services/blogService';
+import connectDB from '@/lib/mongodb'; // Still needed for PUT/DELETE until fully refactored
+import Blog from '@/models/Blog'; // Still needed for PUT/DELETE
+
 
 // GET - Fetch a single blog by slug
 export async function GET(request, { params }) {
   try {
-    await connectDB();
-
     const { slug } = await params;
 
-    const blog = await Blog.findOne({ slug });
+    const blog = await getBlogBySlug(slug);
 
     if (!blog) {
       return NextResponse.json(
@@ -43,6 +43,7 @@ export async function GET(request, { params }) {
     );
   }
 }
+
 
 // PUT - Update a blog
 export async function PUT(request, { params }) {
