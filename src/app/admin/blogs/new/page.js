@@ -24,6 +24,7 @@ export default function NewBlogPage() {
     posterImage: '',
     author: '',
     isPublished: false,
+    isFeatured: false,
   })
 
   const handleSubmit = async (e) => {
@@ -189,6 +190,17 @@ export default function NewBlogPage() {
                 />
                 <Label htmlFor="isPublished" className="cursor-pointer">
                   Publish immediately
+                </Label>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <Switch
+                  id="isFeatured"
+                  checked={formData.isFeatured}
+                  onCheckedChange={(checked) => setFormData(prev => ({ ...prev, isFeatured: checked }))}
+                />
+                <Label htmlFor="isFeatured" className="cursor-pointer">
+                  Featured Post
                 </Label>
               </div>
 

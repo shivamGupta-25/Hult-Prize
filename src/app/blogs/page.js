@@ -1,4 +1,5 @@
 import { Separator } from '@/components/ui/separator'
+import FeaturedBlogBanner from '@/components/FeaturedBlogBanner'
 import BlogsView from './BlogsView'
 import { getBlogs } from '@/services/blogService'
 
@@ -36,12 +37,11 @@ export default async function BlogsPage({ searchParams }) {
             Discover insights, stories, and updates from the Hult Prize community
           </p>
         </div>
-
+        <div className="mb-12">
+          <FeaturedBlogBanner />
+        </div>
         <BlogsView initialBlogs={blogs} pagination={pagination} />
       </div>
     </div>
   )
 }
-
-
-

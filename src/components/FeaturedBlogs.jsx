@@ -62,7 +62,7 @@ export const FeaturedBlogs = async () => {
         {/* Header */}
         <header className="text-center space-y-3 sm:space-y-4 mb-8 sm:mb-12">
           <h2 className="text-3xl font-bold tracking-tight sm:text-4xl md:text-5xl text-foreground">
-            Featured Blogs
+            Blogs
           </h2>
           <Separator className="w-20 sm:w-24 mx-auto bg-primary/30" />
           <p className="text-muted-foreground text-base sm:text-lg max-w-2xl mx-auto">

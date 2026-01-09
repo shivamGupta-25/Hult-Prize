@@ -1,6 +1,7 @@
 import Banner from "@/components/Banner";
 import { Motto } from "@/components/Motto";
 import About from "@/components/About";
+import FeaturedBlogBanner from "@/components/FeaturedBlogBanner";
 import { FeaturedBlogs } from "@/components/FeaturedBlogs";
 import { CoreTeamDisplay } from '@/components/CoreTeamDisplay'
 import TeamData from "@/Data/TeamData";
@@ -14,6 +15,7 @@ export default function Home() {
       <Banner />
       <Motto />
       <About />
+      <FeaturedBlogBanner />
       <FeaturedBlogs />
       {coreTeam.length > 0 && (
         <section className="w-full py-12 px-4 sm:px-6 lg:px-8 bg-background">

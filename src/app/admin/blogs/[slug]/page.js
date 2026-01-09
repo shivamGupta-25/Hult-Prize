@@ -49,6 +49,7 @@ export default function EditBlogPage() {
     posterImage: '',
     author: '',
     isPublished: false,
+    isFeatured: false,
   })
   const [engagement, setEngagement] = useState({
     likes: [],
@@ -77,7 +78,9 @@ export default function EditBlogPage() {
           content: data.content || '',
           posterImage: data.posterImage || '',
           author: data.author || '',
+          author: data.author || '',
           isPublished: data.isPublished || false,
+          isFeatured: data.isFeatured || false,
         })
       } else {
         toast.error('Blog not found')
@@ -330,6 +333,17 @@ export default function EditBlogPage() {
                     />
                     <Label htmlFor="isPublished" className="cursor-pointer">
                       Published
+                    </Label>
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <Switch
+                      id="isFeatured"
+                      checked={formData.isFeatured}
+                      onCheckedChange={(checked) => setFormData(prev => ({ ...prev, isFeatured: checked }))}
+                    />
+                    <Label htmlFor="isFeatured" className="cursor-pointer">
+                      Featured Post
                     </Label>
                   </div>
                 </CardContent>

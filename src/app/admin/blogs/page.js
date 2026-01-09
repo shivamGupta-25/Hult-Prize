@@ -41,6 +41,7 @@ import {
   User,
   Search,
   LogOut,
+  Sparkles,
 } from 'lucide-react'
 import { format } from 'date-fns'
 import { toast } from 'sonner'
@@ -133,6 +134,26 @@ export default function AdminBlogsPage() {
     }
   }
 
+  const handleToggleFeatured = async (blog) => {
+    try {
+      const response = await fetch(`/api/blogs/${blog.slug}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ isFeatured: !blog.isFeatured }),
+      })
+
+      if (response.ok) {
+        toast.success(`Blog ${!blog.isFeatured ? 'featured' : 'unfeatured'}`)
+        fetchBlogs()
+      } else {
+        toast.error('Failed to update blog')
+      }
+    } catch (error) {
+      console.error('Error updating blog:', error)
+      toast.error('Failed to update blog')
+    }
+  }
+
   const handleLogout = async () => {
     try {
       const response = await fetch('/api/auth/logout', {
@@ -157,6 +178,7 @@ export default function AdminBlogsPage() {
     const filtered = blogs.filter((blog) => {
       if (statusFilter === 'published') return blog.isPublished
       if (statusFilter === 'draft') return !blog.isPublished
+      if (statusFilter === 'featured') return blog.isFeatured
       return true
     })
 
@@ -237,6 +259,9 @@ export default function AdminBlogsPage() {
               <ToggleGroupItem value="draft" aria-label="Show draft blogs">
                 Drafts
               </ToggleGroupItem>
+              <ToggleGroupItem value="featured" aria-label="Show featured blogs">
+                Featured
+              </ToggleGroupItem>
             </ToggleGroup>
 
             <div className="text-right">
@@ -294,6 +319,12 @@ export default function AdminBlogsPage() {
                             Draft
                           </span>
                         )}
+                        {blog.isFeatured && (
+                          <span className="px-2 py-0.5 text-xs bg-purple-500/20 text-purple-600 dark:text-purple-400 rounded whitespace-nowrap flex items-center gap-1">
+                            <Sparkles className="h-3 w-3" />
+                            Featured
+                          </span>
+                        )}
                       </div>
                       <div className="flex flex-wrap items-center gap-2 sm:gap-3 lg:gap-4 text-xs sm:text-sm text-muted-foreground">
                         <div className="flex items-center gap-1">
@@ -327,6 +358,13 @@ export default function AdminBlogsPage() {
                       </div>
                     </div>
                     <div className="flex items-center gap-1 sm:gap-2 justify-end sm:justify-start shrink-0">
+                      <div className="flex items-center gap-2 mr-2" title={blog.isFeatured ? 'Remove from Featured' : 'Add to Featured'}>
+                        <Sparkles className={`h-4 w-4 ${blog.isFeatured ? 'text-purple-500' : 'text-muted-foreground'}`} />
+                        <Switch
+                          checked={blog.isFeatured}
+                          onCheckedChange={() => handleToggleFeatured(blog)}
+                        />
+                      </div>
                       <div className="flex items-center gap-2 mr-2" title={blog.isPublished ? 'Unpublish' : 'Publish'}>
                         <Switch
                           checked={blog.isPublished}

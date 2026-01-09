@@ -89,6 +89,16 @@ export const getFeaturedBlogs = cache(async () => {
   };
 });
 
+export const getHeroBlog = cache(async () => {
+  await connectDB();
+  const blog = await Blog.findOne({ isPublished: true, isFeatured: true })
+    .sort({ publishedAt: -1 })
+    .lean();
+
+  if (!blog) return null;
+  return serializeBlog(blog);
+});
+
 export const getRecommendedBlogs = cache(async (currentSlug) => {
   await connectDB();
 
@@ -116,7 +126,7 @@ export const getRecommendedBlogs = cache(async (currentSlug) => {
 
 export const createBlog = async (data) => {
   await connectDB();
-  const { title, slug, excerpt, content, posterImage, author, isPublished } = data;
+  const { title, slug, excerpt, content, posterImage, author, isPublished, isFeatured } = data;
 
   // Validate required fields
   if (!title || !content || !author) {
@@ -146,7 +156,16 @@ export const createBlog = async (data) => {
     posterImage: posterImage || '',
     author,
     isPublished: isPublished || false,
+    isFeatured: isFeatured || false,
   };
+
+  // If this blog is featured, un-feature others
+  if (blogData.isFeatured) {
+    await Blog.updateMany(
+      { isFeatured: true },
+      { $set: { isFeatured: false } }
+    );
+  }
 
   if (isPublished) {
     blogData.publishedAt = new Date();
@@ -177,6 +196,18 @@ export const updateBlog = async (currentSlug, data) => {
 
     if (!wasPublished && data.isPublished && !blog.publishedAt) {
       blog.publishedAt = new Date();
+    }
+  }
+
+  if (data.isFeatured !== undefined) {
+    blog.isFeatured = data.isFeatured;
+
+    // If setting to featured, un-feature others
+    if (data.isFeatured) {
+      await Blog.updateMany(
+        { _id: { $ne: blog._id }, isFeatured: true },
+        { $set: { isFeatured: false } }
+      );
     }
   }
 

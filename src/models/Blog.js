@@ -55,6 +55,10 @@ const BlogSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    isFeatured: {
+      type: Boolean,
+      default: false,
+    },
     publishedAt: {
       type: Date,
     },
@@ -85,6 +89,7 @@ const BlogSchema = new mongoose.Schema(
 );
 
 // Create indexes for better query performance
+BlogSchema.index({ isPublished: 1, isFeatured: 1, publishedAt: -1 });
 BlogSchema.index({ isPublished: 1, publishedAt: -1 });
 BlogSchema.index({ likeCount: -1 });
 BlogSchema.index({ likes: -1 });
