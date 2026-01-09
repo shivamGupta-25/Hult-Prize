@@ -1,9 +1,8 @@
 import { NextResponse } from 'next/server';
-import connectDB from '@/lib/mongodb';
-import Blog from '@/models/Blog';
+
 import { cookies } from 'next/headers';
 import { verifySession } from '@/lib/auth';
-import { getBlogs } from '@/services/blogService';
+import { getBlogs, createBlog } from '@/services/blogService';
 
 
 // GET - Fetch all blogs (with optional filtering)
@@ -56,59 +55,18 @@ export async function POST(request) {
       );
     }
 
-    await connectDB();
-
     const body = await request.json();
-    const { title, slug, excerpt, content, posterImage, author, isPublished } = body;
-
-    if (!title || !content || !author) {
-      return NextResponse.json(
-        { error: 'Title, content, and author are required' },
-        { status: 400 }
-      );
-    }
-
-    // Generate slug if not provided
-    let blogSlug = slug;
-    if (!blogSlug) {
-      blogSlug = title
-        .toLowerCase()
-        .replace(/[^a-z0-9]+/g, '-')
-        .replace(/(^-|-$)/g, '');
-    }
-
-    // Check if slug already exists
-    const existingBlog = await Blog.findOne({ slug: blogSlug });
-    if (existingBlog) {
-      return NextResponse.json(
-        { error: 'A blog with this slug already exists' },
-        { status: 400 }
-      );
-    }
-
-    const blogData = {
-      title,
-      slug: blogSlug,
-      excerpt: excerpt || '',
-      content,
-      posterImage: posterImage || '',
-      author,
-      isPublished: isPublished || false,
-    };
-
-    if (isPublished) {
-      blogData.publishedAt = new Date();
-    }
-
-    const blog = await Blog.create(blogData);
+    const blog = await createBlog(body);
 
     return NextResponse.json(blog, { status: 201 });
   } catch (error) {
     console.error('Error creating blog:', error);
 
-    if (error.code === 11000) {
+    // Specific error messages from service
+    if (error.message === 'Title, content, and author are required' ||
+      error.message === 'A blog with this slug already exists') {
       return NextResponse.json(
-        { error: 'A blog with this slug already exists' },
+        { error: error.message },
         { status: 400 }
       );
     }

@@ -1,9 +1,7 @@
 import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import { verifySession } from '@/lib/auth';
-import { getBlogBySlug } from '@/services/blogService';
-import connectDB from '@/lib/mongodb'; // Still needed for PUT/DELETE until fully refactored
-import Blog from '@/models/Blog'; // Still needed for PUT/DELETE
+import { getBlogBySlug, updateBlog, deleteBlog } from '@/services/blogService';
 
 
 // GET - Fetch a single blog by slug
@@ -59,12 +57,10 @@ export async function PUT(request, { params }) {
       );
     }
 
-    await connectDB();
-
     const { slug } = await params;
     const body = await request.json();
 
-    const blog = await Blog.findOne({ slug });
+    const blog = await updateBlog(slug, body);
 
     if (!blog) {
       return NextResponse.json(
@@ -73,40 +69,17 @@ export async function PUT(request, { params }) {
       );
     }
 
-    // Update fields
-    if (body.title !== undefined) blog.title = body.title;
-    if (body.excerpt !== undefined) blog.excerpt = body.excerpt;
-    if (body.content !== undefined) blog.content = body.content;
-    if (body.posterImage !== undefined) blog.posterImage = body.posterImage;
-    if (body.author !== undefined) blog.author = body.author;
-
-    // Handle publish status
-    if (body.isPublished !== undefined) {
-      const wasPublished = blog.isPublished;
-      blog.isPublished = body.isPublished;
-
-      if (!wasPublished && body.isPublished && !blog.publishedAt) {
-        blog.publishedAt = new Date();
-      }
-    }
-
-    // Handle slug change
-    if (body.slug !== undefined && body.slug !== blog.slug) {
-      const existingBlog = await Blog.findOne({ slug: body.slug });
-      if (existingBlog && existingBlog._id.toString() !== blog._id.toString()) {
-        return NextResponse.json(
-          { error: 'A blog with this slug already exists' },
-          { status: 400 }
-        );
-      }
-      blog.slug = body.slug;
-    }
-
-    await blog.save();
-
     return NextResponse.json(blog);
   } catch (error) {
     console.error('Error updating blog:', error);
+
+    if (error.message === 'A blog with this slug already exists') {
+      return NextResponse.json(
+        { error: error.message },
+        { status: 400 }
+      );
+    }
+
     return NextResponse.json(
       { error: 'Failed to update blog' },
       { status: 500 }
@@ -128,13 +101,10 @@ export async function DELETE(request, { params }) {
       );
     }
 
-    await connectDB();
-
     const { slug } = await params;
+    const success = await deleteBlog(slug);
 
-    const blog = await Blog.findOneAndDelete({ slug });
-
-    if (!blog) {
+    if (!success) {
       return NextResponse.json(
         { error: 'Blog not found' },
         { status: 404 }

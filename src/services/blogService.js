@@ -5,153 +5,215 @@ import { cache } from 'react';
 
 // Use React cache to deduplicate requests in a single render pass
 export const getBlogs = cache(async (params = {}) => {
-    await connectDB();
+  await connectDB();
 
-    const {
-        page = 1,
-        limit = 10,
-        search = '',
-        sortBy = 'publishedAt',
-        order = 'desc',
-        published // boolean or undefined
-    } = params;
+  const {
+    page = 1,
+    limit = 10,
+    search = '',
+    sortBy = 'publishedAt',
+    order = 'desc',
+    published // boolean or undefined
+  } = params;
 
-    const skip = (page - 1) * limit;
+  const skip = (page - 1) * limit;
 
-    // Build query
-    const query = {};
+  // Build query
+  const query = {};
 
-    if (published !== undefined) {
-        query.isPublished = published;
-    }
+  if (published !== undefined) {
+    query.isPublished = published;
+  }
 
-    if (search) {
-        const searchRegex = escapeRegex(search);
-        query.$or = [
-            { title: { $regex: searchRegex, $options: 'i' } },
-            { excerpt: { $regex: searchRegex, $options: 'i' } },
-            { content: { $regex: searchRegex, $options: 'i' } },
-        ];
-    }
+  if (search) {
+    const searchRegex = escapeRegex(search);
+    query.$or = [
+      { title: { $regex: searchRegex, $options: 'i' } },
+      { excerpt: { $regex: searchRegex, $options: 'i' } },
+      { content: { $regex: searchRegex, $options: 'i' } },
+    ];
+  }
 
-    // Build sort object
-    const sort = {};
-    if (sortBy === 'likes') {
-        sort['likeCount'] = order === 'asc' ? 1 : -1;
-    } else {
-        sort[sortBy] = order === 'asc' ? 1 : -1;
-    }
+  // Build sort object
+  const sort = {};
+  if (sortBy === 'likes') {
+    sort['likeCount'] = order === 'asc' ? 1 : -1;
+  } else {
+    sort[sortBy] = order === 'asc' ? 1 : -1;
+  }
 
-    const blogs = await Blog.find(query)
-        .sort(sort)
-        .skip(skip)
-        .limit(limit)
-        .select('-content') // Exclude full content for list view
-        .lean();
+  const blogs = await Blog.find(query)
+    .sort(sort)
+    .skip(skip)
+    .limit(limit)
+    .select('-content') // Exclude full content for list view
+    .lean();
 
-    const total = await Blog.countDocuments(query);
+  const total = await Blog.countDocuments(query);
 
-    // Serialize for Client Components if needed
-    const serializedBlogs = blogs.map(serializeBlog);
+  // Serialize for Client Components if needed
+  const serializedBlogs = blogs.map(serializeBlog);
 
-    return {
-        blogs: serializedBlogs,
-        pagination: {
-            page: parseInt(page),
-            limit: parseInt(limit),
-            total,
-            pages: Math.ceil(total / limit),
-        },
-    };
+  return {
+    blogs: serializedBlogs,
+    pagination: {
+      page: parseInt(page),
+      limit: parseInt(limit),
+      total,
+      pages: Math.ceil(total / limit),
+    },
+  };
 });
 
 export const getBlogBySlug = cache(async (slug) => {
-    await connectDB();
-    const blog = await Blog.findOne({ slug }).lean();
-    if (!blog) return null;
-    return serializeBlog(blog);
+  await connectDB();
+  const blog = await Blog.findOne({ slug }).lean();
+  if (!blog) return null;
+  return serializeBlog(blog);
 });
 
 export const getFeaturedBlogs = cache(async () => {
-    await connectDB();
+  await connectDB();
 
-    // Parallel fetch for different categories
-    const [liked, viewed, latest] = await Promise.all([
-        Blog.findOne({ isPublished: true }).sort({ likeCount: -1 }).lean(),
-        Blog.findOne({ isPublished: true }).sort({ views: -1 }).lean(),
-        Blog.findOne({ isPublished: true }).sort({ publishedAt: -1 }).lean()
-    ]);
+  // Parallel fetch for different categories
+  const [liked, viewed, latest] = await Promise.all([
+    Blog.findOne({ isPublished: true }).sort({ likeCount: -1 }).lean(),
+    Blog.findOne({ isPublished: true }).sort({ views: -1 }).lean(),
+    Blog.findOne({ isPublished: true }).sort({ publishedAt: -1 }).lean()
+  ]);
 
-    return {
-        liked: liked ? serializeBlog(liked) : null,
-        viewed: viewed ? serializeBlog(viewed) : null,
-        latest: latest ? serializeBlog(latest) : null
-    };
+  return {
+    liked: liked ? serializeBlog(liked) : null,
+    viewed: viewed ? serializeBlog(viewed) : null,
+    latest: latest ? serializeBlog(latest) : null
+  };
 });
 
 export const getRecommendedBlogs = cache(async (currentSlug) => {
-    await connectDB();
+  await connectDB();
 
-    // Logic: 3 latest + 3 most liked, then deduplicate and take top 3
-    const [latest, liked] = await Promise.all([
-        Blog.find({ isPublished: true, slug: { $ne: currentSlug } })
-            .sort({ publishedAt: -1 })
-            .limit(3)
-            .select('title slug excerpt posterImage author publishedAt likes views category')
-            .lean(),
-        Blog.find({ isPublished: true, slug: { $ne: currentSlug } })
-            .sort({ likeCount: -1 })
-            .limit(3)
-            .select('title slug excerpt posterImage author publishedAt likes views category')
-            .lean()
-    ]);
+  // Logic: 3 latest + 3 most liked, then deduplicate and take top 3
+  const [latest, liked] = await Promise.all([
+    Blog.find({ isPublished: true, slug: { $ne: currentSlug } })
+      .sort({ publishedAt: -1 })
+      .limit(3)
+      .select('title slug excerpt posterImage author publishedAt likes views category')
+      .lean(),
+    Blog.find({ isPublished: true, slug: { $ne: currentSlug } })
+      .sort({ likeCount: -1 })
+      .limit(3)
+      .select('title slug excerpt posterImage author publishedAt likes views category')
+      .lean()
+  ]);
 
-    const all = [...latest, ...liked];
-    const unique = all.filter((b, index, self) =>
-        index === self.findIndex((t) => t._id.toString() === b._id.toString())
-    ).slice(0, 3);
+  const all = [...latest, ...liked];
+  const unique = all.filter((b, index, self) =>
+    index === self.findIndex((t) => t._id.toString() === b._id.toString())
+  ).slice(0, 3);
 
-    return unique.map(serializeBlog);
+  return unique.map(serializeBlog);
 });
 
 export const createBlog = async (data) => {
-    await connectDB();
-    const blog = await Blog.create(data);
-    return serializeBlog(blog.toObject());
+  await connectDB();
+  const { title, slug, excerpt, content, posterImage, author, isPublished } = data;
+
+  // Validate required fields
+  if (!title || !content || !author) {
+    throw new Error('Title, content, and author are required');
+  }
+
+  // Generate slug if not provided
+  let blogSlug = slug;
+  if (!blogSlug) {
+    blogSlug = title
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/(^-|-$)/g, '');
+  }
+
+  // Check availability
+  const existingBlog = await Blog.findOne({ slug: blogSlug });
+  if (existingBlog) {
+    throw new Error('A blog with this slug already exists');
+  }
+
+  const blogData = {
+    title,
+    slug: blogSlug,
+    excerpt: excerpt || '',
+    content,
+    posterImage: posterImage || '',
+    author,
+    isPublished: isPublished || false,
+  };
+
+  if (isPublished) {
+    blogData.publishedAt = new Date();
+  }
+
+  const blog = await Blog.create(blogData);
+  return serializeBlog(blog.toObject());
 };
 
-export const updateBlog = async (slug, data) => {
-    await connectDB();
-    const blog = await Blog.findOne({ slug });
-    if (!blog) return null;
+export const updateBlog = async (currentSlug, data) => {
+  await connectDB();
+  const blog = await Blog.findOne({ slug: currentSlug });
+  if (!blog) return null;
 
-    Object.assign(blog, data);
-    await blog.save();
-    return serializeBlog(blog.toObject());
+  // Handle slug updates
+  if (data.slug && data.slug !== blog.slug) {
+    const existingBlog = await Blog.findOne({ slug: data.slug });
+    if (existingBlog && existingBlog._id.toString() !== blog._id.toString()) {
+      throw new Error('A blog with this slug already exists');
+    }
+    blog.slug = data.slug;
+  }
+
+  // Handle publish status changes
+  if (data.isPublished !== undefined) {
+    const wasPublished = blog.isPublished;
+    blog.isPublished = data.isPublished;
+
+    if (!wasPublished && data.isPublished && !blog.publishedAt) {
+      blog.publishedAt = new Date();
+    }
+  }
+
+  // Update other fields
+  if (data.title !== undefined) blog.title = data.title;
+  if (data.excerpt !== undefined) blog.excerpt = data.excerpt;
+  if (data.content !== undefined) blog.content = data.content;
+  if (data.posterImage !== undefined) blog.posterImage = data.posterImage;
+  if (data.author !== undefined) blog.author = data.author;
+
+  await blog.save();
+  return serializeBlog(blog.toObject());
 };
 
 export const deleteBlog = async (slug) => {
-    await connectDB();
-    return Blog.findOneAndDelete({ slug });
+  await connectDB();
+  const result = await Blog.findOneAndDelete({ slug });
+  return result ? true : false;
 };
 
 // Helper to standardise ID and Date serialization
 function serializeBlog(blog) {
-    if (!blog) return null;
-    return {
-        ...blog,
-        _id: blog._id.toString(),
-        createdAt: blog.createdAt?.toISOString(),
-        updatedAt: blog.updatedAt?.toISOString(),
-        publishedAt: blog.publishedAt?.toISOString(),
-        likes: blog.likes?.map(id => id.toString()) || [],
-        dislikes: blog.dislikes?.map(id => id.toString()) || [],
-        comments: blog.comments?.map(comment => ({
-            ...comment,
-            _id: comment._id?.toString(),
-            createdAt: comment.createdAt?.toISOString()
-        })) || [],
-        views: blog.views || 0,
-        likeCount: blog.likeCount || 0
-    };
+  if (!blog) return null;
+  return {
+    ...blog,
+    _id: blog._id.toString(),
+    createdAt: blog.createdAt?.toISOString(),
+    updatedAt: blog.updatedAt?.toISOString(),
+    publishedAt: blog.publishedAt?.toISOString(),
+    likes: blog.likes?.map(id => id.toString()) || [],
+    dislikes: blog.dislikes?.map(id => id.toString()) || [],
+    comments: blog.comments?.map(comment => ({
+      ...comment,
+      _id: comment._id?.toString(),
+      createdAt: comment.createdAt?.toISOString()
+    })) || [],
+    views: blog.views || 0,
+    likeCount: blog.likeCount || 0
+  };
 }
