@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect, useMemo } from 'react'
+import useDebounce from '@/hooks/useDebounce'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -57,9 +58,11 @@ export default function AdminBlogsPage() {
   const [page, setPage] = useState(1)
   const pageSize = 8
 
+  const debouncedSearchQuery = useDebounce(searchQuery, 500)
+
   useEffect(() => {
     fetchBlogs()
-  }, [searchQuery])
+  }, [debouncedSearchQuery])
 
   const fetchBlogs = async () => {
     setLoading(true)

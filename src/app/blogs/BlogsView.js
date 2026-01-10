@@ -5,17 +5,11 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group'
-import {
-  Pagination,
-  PaginationContent,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-  PaginationEllipsis,
-} from '@/components/ui/pagination'
+import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious, PaginationEllipsis } from '@/components/ui/pagination'
 import { Search, Grid3x3, List } from 'lucide-react'
 import BlogCard from './BlogCard'
+import useDebounce from '@/hooks/useDebounce'
+import { Separator } from '@/components/ui/separator'
 
 const VIEW_MODE_KEY = 'blog-view-mode'
 
@@ -31,6 +25,7 @@ export default function BlogsView({ initialBlogs, pagination }) {
   // Local State
   const [viewMode, setViewMode] = useState('grid')
   const [searchTerm, setSearchTerm] = useState(searchQuery)
+  const debouncedSearchTerm = useDebounce(searchTerm, 500)
 
   // Load view mode preference
   useEffect(() => {
@@ -65,9 +60,21 @@ export default function BlogsView({ initialBlogs, pagination }) {
     return () => window.removeEventListener('resize', handleResize)
   }, [viewMode])
 
-  // Update search term when URL changes
+  // Sync debounced search term with URL
   useEffect(() => {
-    setSearchTerm(searchParams.get('search') || '')
+    // Only update if the search term has actually changed from what's in the URL
+    // This prevents initial load sync issues and unnecessary updates
+    if (debouncedSearchTerm !== (searchParams.get('search') || '')) {
+      updateUrl({ search: debouncedSearchTerm })
+    }
+  }, [debouncedSearchTerm])
+
+  // Update local state if URL changes externally (e.g. back button)
+  useEffect(() => {
+    const urlSearch = searchParams.get('search') || ''
+    if (urlSearch !== searchTerm) {
+      setSearchTerm(urlSearch)
+    }
   }, [searchParams])
 
   const updateUrl = (newParams) => {
@@ -85,7 +92,7 @@ export default function BlogsView({ initialBlogs, pagination }) {
       if (newParams.page === undefined) params.set('page', '1')
     }
 
-    router.push(`/blogs?${params.toString()}`)
+    router.push(`/blogs?${params.toString()}`, { scroll: false })
   }
 
   const handleSearch = (e) => {
@@ -100,6 +107,7 @@ export default function BlogsView({ initialBlogs, pagination }) {
 
   return (
     <>
+      <Separator className="w-20 sm:w-24 mx-auto bg-primary/30 mb-8" />
       {/* Search, Sort, and View Controls */}
       <div className="mb-8 space-y-4">
         <div className="flex flex-col sm:flex-row gap-4">
@@ -114,7 +122,6 @@ export default function BlogsView({ initialBlogs, pagination }) {
                 className="pl-10"
               />
             </div>
-            <Button type="submit">Search</Button>
           </form>
           <div className="flex gap-2 items-center">
             <ToggleGroup
