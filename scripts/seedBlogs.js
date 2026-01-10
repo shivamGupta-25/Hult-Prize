@@ -28,6 +28,7 @@ const BlogSchema = new mongoose.Schema({
   dislikes: { type: [String], default: [] },
   likeCount: { type: Number, default: 0 },
   views: { type: Number, default: 0 },
+  commentCount: { type: Number, default: 0 },
 }, {
   timestamps: true
 });
@@ -168,6 +169,22 @@ async function seed() {
       const views = isPublished ? generateViews() : 0;
       const likes = isPublished ? generateLikes(views) : [];
 
+      // Determine comments beforehand
+      let comments = [];
+      let commentCount = 0;
+      if (isPublished) {
+        commentCount = randomInt(0, 15);
+        for (let j = 0; j < commentCount; j++) {
+          comments.push({
+            blogSlug: slug,
+            author: randomItem(COMMENTERS),
+            content: "This is a great read! " + Math.random().toString(36).substring(7),
+            isApproved: true,
+            createdAt: randomPastDate(30)
+          });
+        }
+      }
+
       const blogData = {
         title,
         slug,
@@ -180,30 +197,18 @@ async function seed() {
         likes,
         likeCount: likes.length,
         dislikes: [],
-        views
+        views,
+        commentCount // Set the count
       };
 
       try {
         const blog = await Blog.create(blogData);
         createdBlogs++;
 
-        // 3. Generate and Insert Comments for this Blog
-        if (isPublished) {
-          const commentCount = randomInt(0, 15);
-          const comments = [];
-          for (let j = 0; j < commentCount; j++) {
-            comments.push({
-              blogSlug: slug,
-              author: randomItem(COMMENTERS),
-              content: "This is a great read! " + Math.random().toString(36).substring(7),
-              isApproved: true,
-              createdAt: randomPastDate(30)
-            });
-          }
-          if (comments.length > 0) {
-            await Comment.insertMany(comments);
-            createdComments += comments.length;
-          }
+        // 3. Insert Comments
+        if (comments.length > 0) {
+          await Comment.insertMany(comments);
+          createdComments += comments.length;
         }
 
       } catch (e) {

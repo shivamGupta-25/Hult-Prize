@@ -11,6 +11,10 @@ export async function GET(request, { params }) {
     const { searchParams } = new URL(request.url);
     const isAdmin = searchParams.get('isAdmin') === 'true';
 
+    const page = parseInt(searchParams.get('page') || '1');
+    const limit = parseInt(searchParams.get('limit') || '20');
+    const skip = (page - 1) * limit;
+
     const query = { blogSlug: slug };
     if (!isAdmin) {
       query.isApproved = true;
@@ -18,6 +22,8 @@ export async function GET(request, { params }) {
 
     const comments = await Comment.find(query)
       .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit)
       .lean();
 
     // Serialize _id and dates
@@ -66,6 +72,12 @@ export async function POST(request, { params }) {
       author: body.author,
       content: body.content,
     });
+
+    // Increment comment count on blog
+    await Blog.updateOne(
+      { slug },
+      { $inc: { commentCount: 1 } }
+    );
 
     return NextResponse.json({
       ...newComment.toObject(),

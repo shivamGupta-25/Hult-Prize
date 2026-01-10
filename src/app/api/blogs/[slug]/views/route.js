@@ -65,12 +65,30 @@ export async function POST(request, { params }) {
     // Update cookie with new timestamp
     viewedBlogs[slug] = now;
 
-    // Clean up old entries (older than 7 days  )
-    Object.keys(viewedBlogs).forEach(key => {
-      if (now - viewedBlogs[key] > VIEW_EXPIRY_MS) {
-        delete viewedBlogs[key];
+    // Clean up old entries (older than 7 days)
+    // Reduce size to max 50 recent entries to prevent cookie overflow
+    const sortedSlugs = Object.keys(viewedBlogs).sort((a, b) => viewedBlogs[b] - viewedBlogs[a]);
+
+    // Keep only top 50 recents + remove expired
+    const keptSlugs = [];
+    for (const key of sortedSlugs) {
+      if (now - viewedBlogs[key] <= VIEW_EXPIRY_MS) {
+        keptSlugs.push(key);
       }
+    }
+
+    // If more than 50, truncate
+    if (keptSlugs.length > 50) {
+      keptSlugs.length = 50;
+    }
+
+    // Rebuild object
+    const newViewedBlogs = {};
+    keptSlugs.forEach(key => {
+      newViewedBlogs[key] = viewedBlogs[key];
     });
+
+    viewedBlogs = newViewedBlogs;
 
     // Set the updated cookie
     const response = NextResponse.json({

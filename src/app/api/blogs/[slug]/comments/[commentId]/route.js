@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import Comment from '@/models/Comment';
+import Blog from '@/models/Blog';
 
 // PUT - Update comment (approve/unapprove or edit)
 export async function PUT(request, { params }) {
@@ -19,8 +20,15 @@ export async function PUT(request, { params }) {
       );
     }
 
-    if (body.isApproved !== undefined) {
+    if (body.isApproved !== undefined && body.isApproved !== comment.isApproved) {
+      const isApproving = body.isApproved;
       comment.isApproved = body.isApproved;
+
+      // Update blog comment count
+      await Blog.updateOne(
+        { slug: comment.blogSlug },
+        { $inc: { commentCount: isApproving ? 1 : -1 } }
+      );
     }
 
     if (body.content !== undefined) {
@@ -57,6 +65,14 @@ export async function DELETE(request, { params }) {
       return NextResponse.json(
         { error: 'Comment not found' },
         { status: 404 }
+      );
+    }
+
+    // If deleted comment was approved, decrement count on blog
+    if (result.isApproved) {
+      await Blog.updateOne(
+        { slug: result.blogSlug },
+        { $inc: { commentCount: -1 } }
       );
     }
 

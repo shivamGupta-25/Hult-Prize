@@ -49,22 +49,9 @@ export const getBlogs = cache(async (params = {}) => {
     { $skip: skip },
     { $limit: parseInt(limit) },
     {
-      $lookup: {
-        from: 'comments',
-        localField: 'slug',
-        foreignField: 'blogSlug',
-        as: 'commentsData' // temporary field
-      }
-    },
-    {
-      $addFields: {
-        commentCount: { $size: '$commentsData' }
-      }
-    },
-    {
       $project: {
-        commentsData: 0, // remove the heavy array
         content: 0 // exclude content for list view
+        // commentCount is now a direct field, no need for lookup
       }
     }
   ];

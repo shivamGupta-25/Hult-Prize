@@ -36,6 +36,9 @@ export default function BlogClient({ initialBlog, slug, recommendedBlogs = [] })
   const [loading, setLoading] = useState(!initialBlog)
   const [engagement, setEngagement] = useState({ likes: 0, likesList: [], userLiked: false, userDisliked: false }) // likesList not needed in UI but good to match structure if needed, actually removed from UI usage
   const [comments, setComments] = useState([])
+  const [commentPage, setCommentPage] = useState(1)
+  const [hasMoreComments, setHasMoreComments] = useState(true)
+  const [loadingComments, setLoadingComments] = useState(false)
   const [comment, setComment] = useState('')
   const [commentAuthor, setCommentAuthor] = useState('')
   const [submittingComment, setSubmittingComment] = useState(false)
@@ -122,17 +125,36 @@ export default function BlogClient({ initialBlog, slug, recommendedBlogs = [] })
     }
   }
 
-  const fetchComments = async () => {
+  const fetchComments = async (page = 1, append = false) => {
+    setLoadingComments(true)
     try {
-      const response = await fetch(`/api/blogs/${slug}/comments`)
+      const response = await fetch(`/api/blogs/${slug}/comments?page=${page}&limit=20`)
       const data = await response.json()
 
       if (response.ok) {
-        setComments(data)
+        if (data.length < 20) {
+          setHasMoreComments(false)
+        } else {
+          setHasMoreComments(true)
+        }
+
+        if (append) {
+          setComments(prev => [...prev, ...data])
+        } else {
+          setComments(data)
+        }
       }
     } catch (error) {
       console.error('Error fetching comments:', error)
+    } finally {
+      setLoadingComments(false)
     }
+  }
+
+  const loadMoreComments = () => {
+    const nextPage = commentPage + 1
+    setCommentPage(nextPage)
+    fetchComments(nextPage, true)
   }
 
   // fetchRecommendedBlogs removed
@@ -183,7 +205,9 @@ export default function BlogClient({ initialBlog, slug, recommendedBlogs = [] })
       const data = await response.json()
 
       if (response.ok) {
-        setComments(prev => [data, ...prev])
+        // Reset pagination and reload top comments to show the new one
+        setCommentPage(1)
+        fetchComments(1, false)
         setComment('')
         setCommentAuthor('')
         toast.success('Comment added successfully')
@@ -404,6 +428,18 @@ export default function BlogClient({ initialBlog, slug, recommendedBlogs = [] })
                 ))
               )}
             </div>
+            {/* Load More Comments */}
+            {hasMoreComments && comments.length > 0 && (
+              <div className="mt-4 text-center">
+                <Button
+                  variant="outline"
+                  onClick={loadMoreComments}
+                  disabled={loadingComments}
+                >
+                  {loadingComments ? 'Loading...' : 'Load More Comments'}
+                </Button>
+              </div>
+            )}
           </div>
 
           {/* Recommended Blogs */}
