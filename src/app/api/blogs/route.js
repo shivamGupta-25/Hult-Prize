@@ -1,9 +1,9 @@
 import { NextResponse } from 'next/server';
-
 import { cookies } from 'next/headers';
 import { verifySession } from '@/lib/auth';
 import { getBlogs, createBlog } from '@/services/blogService';
-
+import { handleApiError, validateRequest } from '@/lib/api-utils';
+import { blogSchema } from '@/lib/validation';
 
 // GET - Fetch all blogs (with optional filtering)
 export async function GET(request) {
@@ -32,11 +32,7 @@ export async function GET(request) {
 
     return NextResponse.json(result);
   } catch (error) {
-    console.error('Error fetching blogs:', error);
-    return NextResponse.json(
-      { error: 'Failed to fetch blogs' },
-      { status: 500 }
-    );
+    return handleApiError(error);
   }
 }
 
@@ -55,25 +51,14 @@ export async function POST(request) {
       );
     }
 
-    const body = await request.json();
+    // Validate body using Zod
+    const body = await validateRequest(request, blogSchema);
+
+    // Create using service
     const blog = await createBlog(body);
 
     return NextResponse.json(blog, { status: 201 });
   } catch (error) {
-    console.error('Error creating blog:', error);
-
-    // Specific error messages from service
-    if (error.message === 'Title, content, and author are required' ||
-      error.message === 'A blog with this slug already exists') {
-      return NextResponse.json(
-        { error: error.message },
-        { status: 400 }
-      );
-    }
-
-    return NextResponse.json(
-      { error: 'Failed to create blog' },
-      { status: 500 }
-    );
+    return handleApiError(error);
   }
 }

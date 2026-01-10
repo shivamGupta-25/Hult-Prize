@@ -2,6 +2,8 @@ import { NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import Comment from '@/models/Comment';
 import Blog from '@/models/Blog';
+import { handleApiError, validateRequest } from '@/lib/api-utils';
+import { commentSchema } from '@/lib/validation';
 
 // GET - Fetch comments for a blog
 export async function GET(request, { params }) {
@@ -36,11 +38,7 @@ export async function GET(request, { params }) {
 
     return NextResponse.json(serializedComments);
   } catch (error) {
-    console.error('Error fetching comments:', error);
-    return NextResponse.json(
-      { error: 'Failed to fetch comments' },
-      { status: 500 }
-    );
+    return handleApiError(error);
   }
 }
 
@@ -49,14 +47,9 @@ export async function POST(request, { params }) {
   try {
     await connectDB();
     const { slug } = await params;
-    const body = await request.json();
 
-    if (!body.author || !body.content) {
-      return NextResponse.json(
-        { error: 'Author and content are required' },
-        { status: 400 }
-      );
-    }
+    // Validate request body
+    const body = await validateRequest(request, commentSchema);
 
     // Verify blog exists
     const blog = await Blog.findOne({ slug });
@@ -87,10 +80,6 @@ export async function POST(request, { params }) {
       updatedAt: newComment.updatedAt.toISOString(),
     }, { status: 201 });
   } catch (error) {
-    console.error('Error creating comment:', error);
-    return NextResponse.json(
-      { error: 'Failed to create comment' },
-      { status: 500 }
-    );
+    return handleApiError(error);
   }
 }

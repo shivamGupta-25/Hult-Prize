@@ -1,6 +1,6 @@
 import connectDB from '@/lib/mongodb';
 import Blog from '@/models/Blog';
-import { escapeRegex } from '@/lib/utils';
+import Comment from '@/models/Comment'; // Import Comment for cascade delete
 import { cache } from 'react';
 
 // Use React cache to deduplicate requests in a single render pass
@@ -85,26 +85,41 @@ export const getBlogBySlug = cache(async (slug) => {
   return serializeBlog(blog);
 });
 
+// NEW: Helper to increment views atomically
+export const incrementBlogViews = async (slug) => {
+  await connectDB();
+  await Blog.updateOne({ slug }, { $inc: { views: 1 } });
+};
+
 export const getFeaturedBlogs = cache(async () => {
   await connectDB();
 
-  // Parallel fetch for different categories
-  const [liked, viewed, latest] = await Promise.all([
-    Blog.aggregate([
-      { $match: { isPublished: true } },
-      { $addFields: { likeCount: { $size: '$likes' } } },
-      { $sort: { likeCount: -1 } },
-      { $limit: 1 }
-    ]).then(res => res[0]),
-    Blog.findOne({ isPublished: true }).sort({ views: -1 }).lean(),
-    Blog.findOne({ isPublished: true }).sort({ publishedAt: -1 }).lean()
+  const [results] = await Blog.aggregate([
+    { $match: { isPublished: true } },
+    {
+      $facet: {
+        liked: [
+          { $addFields: { likeCount: { $size: '$likes' } } },
+          { $sort: { likeCount: -1 } },
+          { $limit: 1 }
+        ],
+        viewed: [
+          { $sort: { views: -1 } },
+          { $limit: 1 }
+        ],
+        latest: [
+          { $sort: { publishedAt: -1 } },
+          { $limit: 1 }
+        ]
+      }
+    }
   ]);
 
-  return {
-    liked: liked ? serializeBlog(liked) : null,
-    viewed: viewed ? serializeBlog(viewed) : null,
-    latest: latest ? serializeBlog(latest) : null
-  };
+  const liked = results.liked[0] ? serializeBlog(results.liked[0]) : null;
+  const viewed = results.viewed[0] ? serializeBlog(results.viewed[0]) : null;
+  const latest = results.latest[0] ? serializeBlog(results.latest[0]) : null;
+
+  return { liked, viewed, latest };
 });
 
 export const getHeroBlog = cache(async () => {
@@ -120,23 +135,30 @@ export const getHeroBlog = cache(async () => {
 export const getRecommendedBlogs = cache(async (currentSlug) => {
   await connectDB();
 
-  // Logic: 3 latest + 3 most liked, then deduplicate and take top 3
-  const [latest, liked] = await Promise.all([
-    Blog.find({ isPublished: true, slug: { $ne: currentSlug } })
-      .sort({ publishedAt: -1 })
-      .limit(3)
-      .select('title slug excerpt posterImage author publishedAt likes views category')
-      .lean(),
-    Blog.aggregate([
-      { $match: { isPublished: true, slug: { $ne: currentSlug } } },
-      { $addFields: { likeCountSize: { $size: '$likes' } } },
-      { $sort: { likeCountSize: -1 } },
-      { $limit: 3 },
-      { $project: { title: 1, slug: 1, excerpt: 1, posterImage: 1, author: 1, publishedAt: 1, likes: 1, views: 1, category: 1 } }
-    ])
+  const [results] = await Blog.aggregate([
+    { $match: { isPublished: true, slug: { $ne: currentSlug } } },
+    {
+      $facet: {
+        latest: [
+          { $sort: { publishedAt: -1 } },
+          { $limit: 3 },
+          { $project: { title: 1, slug: 1, excerpt: 1, posterImage: 1, author: 1, publishedAt: 1, likes: 1, views: 1, category: 1 } }
+        ],
+        liked: [
+          { $addFields: { likeCountSize: { $size: '$likes' } } },
+          { $sort: { likeCountSize: -1 } },
+          { $limit: 3 },
+          { $project: { title: 1, slug: 1, excerpt: 1, posterImage: 1, author: 1, publishedAt: 1, likes: 1, views: 1, category: 1 } }
+        ]
+      }
+    }
   ]);
 
+  const latest = results.latest || [];
+  const liked = results.liked || [];
   const all = [...latest, ...liked];
+
+  // Deduplicate
   const unique = all.filter((b, index, self) =>
     index === self.findIndex((t) => t._id.toString() === b._id.toString())
   ).slice(0, 3);
@@ -146,14 +168,13 @@ export const getRecommendedBlogs = cache(async (currentSlug) => {
 
 export const createBlog = async (data) => {
   await connectDB();
+
+  // Note: Validation is now handled by Zod in the API route before calling this service.
+  // We can trust specific fields exist, but we still handle business logic like slugs.
+
   const { title, slug, excerpt, content, posterImage, author, isPublished, isFeatured } = data;
 
-  // Validate required fields
-  if (!title || !content || !author) {
-    throw new Error('Title, content, and author are required');
-  }
-
-  // Generate slug if not provided
+  // Generate slug if not provided or empty
   let blogSlug = slug;
   if (!blogSlug) {
     blogSlug = title
@@ -207,13 +228,11 @@ export const updateBlog = async (currentSlug, data) => {
       throw new Error('A blog with this slug already exists');
     }
 
-    // CASCASE UPDATE: Update all comments associated with the old slug
+    // CASCADE UPDATE: Update all comments associated with the old slug
     const oldSlug = blog.slug;
     blog.slug = data.slug;
 
-    // Import Comment model dynamically to avoid circular dependencies if any (though usually fine here)
-    // better to import at top, but for minimal diff:
-    const Comment = (await import('@/models/Comment')).default;
+    // We already imported Comment at the top
     await Comment.updateMany({ blogSlug: oldSlug }, { blogSlug: data.slug });
   }
 
@@ -239,7 +258,8 @@ export const updateBlog = async (currentSlug, data) => {
     }
   }
 
-  // Update other fields
+  // Update other fields if they are present in data
+  // Note: undefined checks are crucial to allow partial updates
   if (data.title !== undefined) blog.title = data.title;
   if (data.excerpt !== undefined) blog.excerpt = data.excerpt;
   if (data.content !== undefined) blog.content = data.content;
@@ -252,8 +272,18 @@ export const updateBlog = async (currentSlug, data) => {
 
 export const deleteBlog = async (slug) => {
   await connectDB();
-  const result = await Blog.findOneAndDelete({ slug });
-  return result ? true : false;
+
+  // Find the blog first to ensure it exists
+  const blog = await Blog.findOne({ slug });
+  if (!blog) return false;
+
+  // CASCADE DELETE: Delete all comments associated with this blog
+  await Comment.deleteMany({ blogSlug: slug });
+
+  // Delete the blog
+  await Blog.deleteOne({ _id: blog._id });
+
+  return true;
 };
 
 // Helper to standardise ID and Date serialization
@@ -267,7 +297,7 @@ function serializeBlog(blog) {
     publishedAt: blog.publishedAt?.toISOString(),
     likes: blog.likes?.map(id => id.toString()) || [],
     dislikes: blog.dislikes?.map(id => id.toString()) || [],
-    // comments removed from blog object
+    // comments removed from blog object in previous discussions, keeping it clean
     views: blog.views || 0,
     likeCount: blog.likes?.length || 0,
     commentCount: blog.commentCount || 0

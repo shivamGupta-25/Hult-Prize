@@ -1,13 +1,19 @@
 import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import { verifySession } from '@/lib/auth';
-import { getBlogBySlug, updateBlog, deleteBlog } from '@/services/blogService';
+import { getBlogBySlug, updateBlog, deleteBlog, incrementBlogViews } from '@/services/blogService';
+import { handleApiError, validateRequest } from '@/lib/api-utils';
+import { updateBlogSchema } from '@/lib/validation';
 
 
 // GET - Fetch a single blog by slug
 export async function GET(request, { params }) {
   try {
     const { slug } = await params;
+
+    // Increment views (fire and forget, or await if critical)
+    // We await it here to ensure it's counted, but in high trafic apps we might fire-and-forget
+    await incrementBlogViews(slug);
 
     const blog = await getBlogBySlug(slug);
 
@@ -34,11 +40,7 @@ export async function GET(request, { params }) {
 
     return NextResponse.json(blog);
   } catch (error) {
-    console.error('Error fetching blog:', error);
-    return NextResponse.json(
-      { error: 'Failed to fetch blog' },
-      { status: 500 }
-    );
+    return handleApiError(error);
   }
 }
 
@@ -58,7 +60,9 @@ export async function PUT(request, { params }) {
     }
 
     const { slug } = await params;
-    const body = await request.json();
+
+    // Validate request body
+    const body = await validateRequest(request, updateBlogSchema);
 
     const blog = await updateBlog(slug, body);
 
@@ -71,19 +75,7 @@ export async function PUT(request, { params }) {
 
     return NextResponse.json(blog);
   } catch (error) {
-    console.error('Error updating blog:', error);
-
-    if (error.message === 'A blog with this slug already exists') {
-      return NextResponse.json(
-        { error: error.message },
-        { status: 400 }
-      );
-    }
-
-    return NextResponse.json(
-      { error: 'Failed to update blog' },
-      { status: 500 }
-    );
+    return handleApiError(error);
   }
 }
 
@@ -113,10 +105,6 @@ export async function DELETE(request, { params }) {
 
     return NextResponse.json({ message: 'Blog deleted successfully' });
   } catch (error) {
-    console.error('Error deleting blog:', error);
-    return NextResponse.json(
-      { error: 'Failed to delete blog' },
-      { status: 500 }
-    );
+    return handleApiError(error);
   }
 }

@@ -25,7 +25,7 @@ export default async function BlogsPage({ searchParams }) {
     <div className="min-h-screen bg-background">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         {/* Header */}
-        <div className="text-center mb-12">
+        <div className="text-center">
           <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-4">
             Our Blog
           </h1>
@@ -34,7 +34,7 @@ export default async function BlogsPage({ searchParams }) {
             Discover insights, stories, and updates from the Hult Prize community
           </p>
         </div>
-        <div className="mb-12">
+        <div className="mb-8">
           <FeaturedBlogBanner />
         </div>
         <BlogsView initialBlogs={blogs} pagination={pagination} />

@@ -67,7 +67,7 @@ const BlogSchema = new mongoose.Schema(
 BlogSchema.index({ title: 'text', excerpt: 'text', content: 'text' });
 BlogSchema.index({ isPublished: 1, isFeatured: 1, publishedAt: -1 });
 BlogSchema.index({ isPublished: 1, publishedAt: -1 });
-// BlogSchema.index({ isPublished: 1, likeCount: -1 }); // Removed in favor of runtime $size sort or aggregation
+
 BlogSchema.index({ isPublished: 1, views: -1 });     // Optimized for "Most Viewed"
 BlogSchema.index({ createdAt: -1 });
 
