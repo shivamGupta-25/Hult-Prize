@@ -49,10 +49,6 @@ const BlogSchema = new mongoose.Schema(
       type: [String],
       default: [],
     },
-    likeCount: {
-      type: Number,
-      default: 0,
-    },
     views: {
       type: Number,
       default: 0,
@@ -68,10 +64,11 @@ const BlogSchema = new mongoose.Schema(
 );
 
 // Create indexes for better query performance
+BlogSchema.index({ title: 'text', excerpt: 'text', content: 'text' });
 BlogSchema.index({ isPublished: 1, isFeatured: 1, publishedAt: -1 });
 BlogSchema.index({ isPublished: 1, publishedAt: -1 });
-BlogSchema.index({ likeCount: -1 });
-BlogSchema.index({ likes: -1 });
+// BlogSchema.index({ isPublished: 1, likeCount: -1 }); // Removed in favor of runtime $size sort or aggregation
+BlogSchema.index({ isPublished: 1, views: -1 });     // Optimized for "Most Viewed"
 BlogSchema.index({ createdAt: -1 });
 
 // Auto-generate slug from title if not provided

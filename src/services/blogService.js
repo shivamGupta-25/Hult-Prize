@@ -26,35 +26,40 @@ export const getBlogs = cache(async (params = {}) => {
   }
 
   if (search) {
-    const searchRegex = escapeRegex(search);
-    matchStage.$or = [
-      { title: { $regex: searchRegex, $options: 'i' } },
-      { excerpt: { $regex: searchRegex, $options: 'i' } },
-      { content: { $regex: searchRegex, $options: 'i' } },
-    ];
-  }
-
-  // Build sort stage
-  const sortStage = {};
-  if (sortBy === 'likes') {
-    sortStage['likeCount'] = order === 'asc' ? 1 : -1;
-  } else {
-    sortStage[sortBy] = order === 'asc' ? 1 : -1;
+    matchStage.$text = { $search: search };
   }
 
   // Aggregation Pipeline
   const pipeline = [
     { $match: matchStage },
-    { $sort: sortStage },
-    { $skip: skip },
-    { $limit: parseInt(limit) },
-    {
-      $project: {
-        content: 0 // exclude content for list view
-        // commentCount is now a direct field, no need for lookup
-      }
-    }
   ];
+
+  // Build sort stage
+  const sortStage = {};
+
+  // Add calculated likeCount for sorting if needed
+  if (sortBy === 'likes') {
+    pipeline.push({
+      $addFields: {
+        calculatedLikeCount: { $size: '$likes' }
+      }
+    });
+    sortStage.calculatedLikeCount = order === 'asc' ? 1 : -1;
+  } else if (search) {
+    sortStage.score = { $meta: 'textScore' };
+  } else {
+    sortStage[sortBy] = order === 'asc' ? 1 : -1;
+  }
+
+  pipeline.push({ $sort: sortStage });
+  pipeline.push({ $skip: skip });
+  pipeline.push({ $limit: parseInt(limit) });
+  pipeline.push({
+    $project: {
+      content: 0, // exclude content for list view
+      calculatedLikeCount: 0 // remove temp field
+    }
+  });
 
   const blogs = await Blog.aggregate(pipeline);
   const total = await Blog.countDocuments(matchStage);
@@ -85,7 +90,12 @@ export const getFeaturedBlogs = cache(async () => {
 
   // Parallel fetch for different categories
   const [liked, viewed, latest] = await Promise.all([
-    Blog.findOne({ isPublished: true }).sort({ likeCount: -1 }).lean(),
+    Blog.aggregate([
+      { $match: { isPublished: true } },
+      { $addFields: { likeCount: { $size: '$likes' } } },
+      { $sort: { likeCount: -1 } },
+      { $limit: 1 }
+    ]).then(res => res[0]),
     Blog.findOne({ isPublished: true }).sort({ views: -1 }).lean(),
     Blog.findOne({ isPublished: true }).sort({ publishedAt: -1 }).lean()
   ]);
@@ -117,11 +127,13 @@ export const getRecommendedBlogs = cache(async (currentSlug) => {
       .limit(3)
       .select('title slug excerpt posterImage author publishedAt likes views category')
       .lean(),
-    Blog.find({ isPublished: true, slug: { $ne: currentSlug } })
-      .sort({ likeCount: -1 })
-      .limit(3)
-      .select('title slug excerpt posterImage author publishedAt likes views category')
-      .lean()
+    Blog.aggregate([
+      { $match: { isPublished: true, slug: { $ne: currentSlug } } },
+      { $addFields: { likeCountSize: { $size: '$likes' } } },
+      { $sort: { likeCountSize: -1 } },
+      { $limit: 3 },
+      { $project: { title: 1, slug: 1, excerpt: 1, posterImage: 1, author: 1, publishedAt: 1, likes: 1, views: 1, category: 1 } }
+    ])
   ]);
 
   const all = [...latest, ...liked];
@@ -194,7 +206,15 @@ export const updateBlog = async (currentSlug, data) => {
     if (existingBlog && existingBlog._id.toString() !== blog._id.toString()) {
       throw new Error('A blog with this slug already exists');
     }
+
+    // CASCASE UPDATE: Update all comments associated with the old slug
+    const oldSlug = blog.slug;
     blog.slug = data.slug;
+
+    // Import Comment model dynamically to avoid circular dependencies if any (though usually fine here)
+    // better to import at top, but for minimal diff:
+    const Comment = (await import('@/models/Comment')).default;
+    await Comment.updateMany({ blogSlug: oldSlug }, { blogSlug: data.slug });
   }
 
   // Handle publish status changes
@@ -249,7 +269,7 @@ function serializeBlog(blog) {
     dislikes: blog.dislikes?.map(id => id.toString()) || [],
     // comments removed from blog object
     views: blog.views || 0,
-    likeCount: blog.likeCount || 0,
+    likeCount: blog.likes?.length || 0,
     commentCount: blog.commentCount || 0
   };
 }

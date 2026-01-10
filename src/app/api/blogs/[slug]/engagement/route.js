@@ -31,19 +31,17 @@ export async function POST(request, { params }) {
       const hasDisliked = blog.dislikes.includes(userId);
 
       if (hasLiked) {
-        // Un-like: Atomically pull from likes and decrement count
+        // Un-like: Atomically pull from likes
         await Blog.updateOne(
           { _id: blog._id },
           {
-            $pull: { likes: userId },
-            $inc: { likeCount: -1 }
+            $pull: { likes: userId }
           }
         );
       } else {
-        // Like: Atomically push to likes, increment count, and pull from dislikes if present
+        // Like: Atomically push to likes and pull from dislikes if present
         const updateOps = {
-          $addToSet: { likes: userId },
-          $inc: { likeCount: 1 }
+          $addToSet: { likes: userId }
         };
         if (hasDisliked) {
           updateOps.$pull = { dislikes: userId };
@@ -61,13 +59,12 @@ export async function POST(request, { params }) {
           { $pull: { dislikes: userId } }
         );
       } else {
-        // Dislike: Atomically push to dislikes and pull from likes if present (decrement count)
+        // Dislike: Atomically push to dislikes and pull from likes if present
         const updateOps = {
           $addToSet: { dislikes: userId }
         };
         if (hasLiked) {
           updateOps.$pull = { likes: userId };
-          updateOps.$inc = { likeCount: -1 };
         }
         await Blog.updateOne({ _id: blog._id }, updateOps);
       }
@@ -79,7 +76,7 @@ export async function POST(request, { params }) {
     }
 
     // Fetch updated Blog to return current state
-    const updatedBlog = await Blog.findById(blog._id).select('likes dislikes likeCount');
+    const updatedBlog = await Blog.findById(blog._id).select('likes dislikes');
 
     return NextResponse.json({
       likes: updatedBlog.likes.length,

@@ -67,17 +67,18 @@ export async function POST(request, { params }) {
       );
     }
 
-    const newComment = await Comment.create({
-      blogSlug: slug,
-      author: body.author,
-      content: body.content,
-    });
-
-    // Increment comment count on blog
-    await Blog.updateOne(
-      { slug },
-      { $inc: { commentCount: 1 } }
-    );
+    const [newComment] = await Promise.all([
+      Comment.create({
+        blogSlug: slug,
+        blogId: blog._id, // Save the stable ID
+        author: body.author,
+        content: body.content,
+      }),
+      Blog.updateOne(
+        { _id: blog._id },
+        { $inc: { commentCount: 1 } }
+      )
+    ]);
 
     return NextResponse.json({
       ...newComment.toObject(),
