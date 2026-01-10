@@ -4,6 +4,9 @@ import Comment from '@/models/Comment';
 import Blog from '@/models/Blog';
 import { handleApiError, validateRequest } from '@/lib/api-utils';
 import { commentSchema } from '@/lib/validation';
+import { verifySession } from '@/lib/auth';
+import { cookies } from 'next/headers';
+import { serializeComment } from '@/lib/serializers';
 
 // GET - Fetch comments for a blog
 export async function GET(request, { params }) {
@@ -11,7 +14,11 @@ export async function GET(request, { params }) {
     await connectDB();
     const { slug } = await params;
     const { searchParams } = new URL(request.url);
-    const isAdmin = searchParams.get('isAdmin') === 'true';
+
+    // SECURE: Check admin session via cookie instead of trust query param
+    const cookieStore = await cookies();
+    const token = cookieStore.get('admin-session')?.value;
+    const isAdmin = await verifySession(token);
 
     const page = parseInt(searchParams.get('page') || '1');
     const limit = parseInt(searchParams.get('limit') || '20');
@@ -29,12 +36,8 @@ export async function GET(request, { params }) {
       .lean();
 
     // Serialize _id and dates
-    const serializedComments = comments.map(comment => ({
-      ...comment,
-      _id: comment._id.toString(),
-      createdAt: comment.createdAt.toISOString(),
-      updatedAt: comment.updatedAt.toISOString(),
-    }));
+    // Serialize _id and dates using helper
+    const serializedComments = comments.map(serializeComment);
 
     return NextResponse.json(serializedComments);
   } catch (error) {
@@ -73,12 +76,7 @@ export async function POST(request, { params }) {
       )
     ]);
 
-    return NextResponse.json({
-      ...newComment.toObject(),
-      _id: newComment._id.toString(),
-      createdAt: newComment.createdAt.toISOString(),
-      updatedAt: newComment.updatedAt.toISOString(),
-    }, { status: 201 });
+    return NextResponse.json(serializeComment(newComment), { status: 201 });
   } catch (error) {
     return handleApiError(error);
   }

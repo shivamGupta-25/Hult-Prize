@@ -3,6 +3,8 @@ import Blog from '@/models/Blog';
 import Comment from '@/models/Comment'; // Import Comment for cascade delete
 import { cache } from 'react';
 
+import { serializeBlog } from '@/lib/serializers';
+
 // Use React cache to deduplicate requests in a single render pass
 export const getBlogs = cache(async (params = {}) => {
   await connectDB();
@@ -86,6 +88,8 @@ export const getBlogBySlug = cache(async (slug) => {
 });
 
 // NEW: Helper to increment views atomically
+// Fire-and-forget logic can be handled by the caller not awaiting or we just return promise.
+// Depending on deployment (Vercel serverless), awaiting might be safer to ensure execution before freeze.
 export const incrementBlogViews = async (slug) => {
   await connectDB();
   await Blog.updateOne({ slug }, { $inc: { views: 1 } });
@@ -286,20 +290,4 @@ export const deleteBlog = async (slug) => {
   return true;
 };
 
-// Helper to standardise ID and Date serialization
-function serializeBlog(blog) {
-  if (!blog) return null;
-  return {
-    ...blog,
-    _id: blog._id.toString(),
-    createdAt: blog.createdAt?.toISOString(),
-    updatedAt: blog.updatedAt?.toISOString(),
-    publishedAt: blog.publishedAt?.toISOString(),
-    likes: blog.likes?.map(id => id.toString()) || [],
-    dislikes: blog.dislikes?.map(id => id.toString()) || [],
-    // comments removed from blog object in previous discussions, keeping it clean
-    views: blog.views || 0,
-    likeCount: blog.likes?.length || 0,
-    commentCount: blog.commentCount || 0
-  };
-}
+// Helper removed in favor of import from @/lib/serializers

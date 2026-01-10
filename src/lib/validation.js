@@ -2,9 +2,11 @@ import { z } from 'zod';
 
 export const blogSchema = z.object({
     title: z.string().min(1, 'Title is required').trim(),
-    slug: z.string().min(1, 'Slug is required')
+    slug: z.string()
         .regex(/^[a-z0-9-]+$/, 'Slug must only contain lowercase letters, numbers, and hyphens')
-        .optional(), // Optional because it can be auto-generated
+        .or(z.literal('')) // Allow empty string (will be auto-generated)
+        .optional()
+        .transform(v => v === '' ? undefined : v),
     excerpt: z.string().trim().optional(),
     content: z.string().min(1, 'Content is required'),
     posterImage: z.string().url('Invalid image URL').optional().or(z.literal('')),
