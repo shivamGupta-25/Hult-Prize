@@ -26,8 +26,8 @@ export default async function BlogsPage({ searchParams }) {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         {/* Header */}
         <div className="text-center">
-          <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-4">
-            Our Blog
+          <h1 className="text-4xl md:text-6xl font-black text-foreground mb-4">
+            <span className="text-white">Our</span> <span className="text-primary">Blog</span>
           </h1>
           <Separator className="w-24 mx-auto bg-primary/30 mb-6" />
           <p className="text-muted-foreground text-lg max-w-2xl mx-auto">

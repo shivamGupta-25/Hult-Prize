@@ -29,7 +29,7 @@ export const About = () => {
         {/* Header */}
         <header className="text-center space-y-3 sm:space-y-4">
           <h2 className="text-3xl font-bold tracking-tight sm:text-4xl md:text-5xl lg:text-6xl text-foreground">
-            About Us
+            <span className="text-white">About</span> <span className="text-primary">Us</span>
           </h2>
           <Separator className="w-20 sm:w-24 mx-auto bg-primary/30" />
         </header>
