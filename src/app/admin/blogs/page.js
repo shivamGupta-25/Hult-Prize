@@ -351,7 +351,7 @@ export default function AdminBlogsPage() {
                           </div>
                           <div className="flex items-center gap-1">
                             <MessageCircle className="h-3 w-3 sm:h-4 sm:w-4 shrink-0" />
-                            <span>{blog.comments?.length || 0}</span>
+                            <span>{blog.commentCount || 0}</span>
                           </div>
                           <div className="flex items-center gap-1">
                             <Eye className="h-3 w-3 sm:h-4 sm:w-4 shrink-0" />

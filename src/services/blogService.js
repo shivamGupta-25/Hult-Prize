@@ -18,38 +18,59 @@ export const getBlogs = cache(async (params = {}) => {
 
   const skip = (page - 1) * limit;
 
-  // Build query
-  const query = {};
+  // Build match stage (query)
+  const matchStage = {};
 
   if (published !== undefined) {
-    query.isPublished = published;
+    matchStage.isPublished = published;
   }
 
   if (search) {
     const searchRegex = escapeRegex(search);
-    query.$or = [
+    matchStage.$or = [
       { title: { $regex: searchRegex, $options: 'i' } },
       { excerpt: { $regex: searchRegex, $options: 'i' } },
       { content: { $regex: searchRegex, $options: 'i' } },
     ];
   }
 
-  // Build sort object
-  const sort = {};
+  // Build sort stage
+  const sortStage = {};
   if (sortBy === 'likes') {
-    sort['likeCount'] = order === 'asc' ? 1 : -1;
+    sortStage['likeCount'] = order === 'asc' ? 1 : -1;
   } else {
-    sort[sortBy] = order === 'asc' ? 1 : -1;
+    sortStage[sortBy] = order === 'asc' ? 1 : -1;
   }
 
-  const blogs = await Blog.find(query)
-    .sort(sort)
-    .skip(skip)
-    .limit(limit)
-    .select('-content') // Exclude full content for list view
-    .lean();
+  // Aggregation Pipeline
+  const pipeline = [
+    { $match: matchStage },
+    { $sort: sortStage },
+    { $skip: skip },
+    { $limit: parseInt(limit) },
+    {
+      $lookup: {
+        from: 'comments',
+        localField: 'slug',
+        foreignField: 'blogSlug',
+        as: 'commentsData' // temporary field
+      }
+    },
+    {
+      $addFields: {
+        commentCount: { $size: '$commentsData' }
+      }
+    },
+    {
+      $project: {
+        commentsData: 0, // remove the heavy array
+        content: 0 // exclude content for list view
+      }
+    }
+  ];
 
-  const total = await Blog.countDocuments(query);
+  const blogs = await Blog.aggregate(pipeline);
+  const total = await Blog.countDocuments(matchStage);
 
   // Serialize for Client Components if needed
   const serializedBlogs = blogs.map(serializeBlog);
@@ -239,12 +260,9 @@ function serializeBlog(blog) {
     publishedAt: blog.publishedAt?.toISOString(),
     likes: blog.likes?.map(id => id.toString()) || [],
     dislikes: blog.dislikes?.map(id => id.toString()) || [],
-    comments: blog.comments?.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).map(comment => ({
-      ...comment,
-      _id: comment._id?.toString(),
-      createdAt: comment.createdAt?.toISOString()
-    })) || [],
+    // comments removed from blog object
     views: blog.views || 0,
-    likeCount: blog.likeCount || 0
+    likeCount: blog.likeCount || 0,
+    commentCount: blog.commentCount || 0
   };
 }

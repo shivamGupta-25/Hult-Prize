@@ -1,25 +1,16 @@
 import { NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
-import Blog from '@/models/Blog';
+import Comment from '@/models/Comment';
 
 // PUT - Update comment (approve/unapprove or edit)
 export async function PUT(request, { params }) {
   try {
     await connectDB();
 
-    const { slug, commentId } = await params;
+    const { commentId } = await params; // params contains slug too, but we just need commentId
     const body = await request.json();
 
-    const blog = await Blog.findOne({ slug });
-
-    if (!blog) {
-      return NextResponse.json(
-        { error: 'Blog not found' },
-        { status: 404 }
-      );
-    }
-
-    const comment = blog.comments.id(commentId);
+    const comment = await Comment.findById(commentId);
 
     if (!comment) {
       return NextResponse.json(
@@ -36,9 +27,14 @@ export async function PUT(request, { params }) {
       comment.content = body.content;
     }
 
-    await blog.save();
+    await comment.save();
 
-    return NextResponse.json(comment);
+    return NextResponse.json({
+      ...comment.toObject(),
+      _id: comment._id.toString(),
+      createdAt: comment.createdAt.toISOString(),
+      updatedAt: comment.updatedAt.toISOString(),
+    });
   } catch (error) {
     console.error('Error updating comment:', error);
     return NextResponse.json(
@@ -53,19 +49,16 @@ export async function DELETE(request, { params }) {
   try {
     await connectDB();
 
-    const { slug, commentId } = await params;
+    const { commentId } = await params;
 
-    const blog = await Blog.findOne({ slug });
+    const result = await Comment.findByIdAndDelete(commentId);
 
-    if (!blog) {
+    if (!result) {
       return NextResponse.json(
-        { error: 'Blog not found' },
+        { error: 'Comment not found' },
         { status: 404 }
       );
     }
-
-    blog.comments.id(commentId).deleteOne();
-    await blog.save();
 
     return NextResponse.json({ message: 'Comment deleted successfully' });
   } catch (error) {

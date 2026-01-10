@@ -2,14 +2,14 @@ import { NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import Blog from '@/models/Blog';
 
-// POST - Handle like/dislike/comment
+// POST - Handle like/dislike
 export async function POST(request, { params }) {
   try {
     await connectDB();
 
     const { slug } = await params;
     const body = await request.json();
-    const { action, userId, comment } = body;
+    const { action, userId } = body;
 
     if (!userId) {
       return NextResponse.json(
@@ -18,8 +18,7 @@ export async function POST(request, { params }) {
       );
     }
 
-    const blog = await Blog.findOne({ slug }).select('likes dislikes comments likeCount');
-
+    const blog = await Blog.findOne({ slug });
     if (!blog) {
       return NextResponse.json(
         { error: 'Blog not found' },
@@ -28,46 +27,50 @@ export async function POST(request, { params }) {
     }
 
     if (action === 'like') {
-      // Toggle like
-      const likeIndex = blog.likes.indexOf(userId);
-      if (likeIndex > -1) {
-        blog.likes.splice(likeIndex, 1);
+      const hasLiked = blog.likes.includes(userId);
+      const hasDisliked = blog.dislikes.includes(userId);
+
+      if (hasLiked) {
+        // Un-like: Atomically pull from likes and decrement count
+        await Blog.updateOne(
+          { _id: blog._id },
+          {
+            $pull: { likes: userId },
+            $inc: { likeCount: -1 }
+          }
+        );
       } else {
-        // Remove from dislikes if present
-        const dislikeIndex = blog.dislikes.indexOf(userId);
-        if (dislikeIndex > -1) {
-          blog.dislikes.splice(dislikeIndex, 1);
+        // Like: Atomically push to likes, increment count, and pull from dislikes if present
+        const updateOps = {
+          $addToSet: { likes: userId },
+          $inc: { likeCount: 1 }
+        };
+        if (hasDisliked) {
+          updateOps.$pull = { dislikes: userId };
         }
-        blog.likes.push(userId);
+        await Blog.updateOne({ _id: blog._id }, updateOps);
       }
     } else if (action === 'dislike') {
-      // Toggle dislike
-      const dislikeIndex = blog.dislikes.indexOf(userId);
-      if (dislikeIndex > -1) {
-        blog.dislikes.splice(dislikeIndex, 1);
-      } else {
-        // Remove from likes if present
-        const likeIndex = blog.likes.indexOf(userId);
-        if (likeIndex > -1) {
-          blog.likes.splice(likeIndex, 1);
-        }
-        blog.dislikes.push(userId);
-      }
+      const hasLiked = blog.likes.includes(userId);
+      const hasDisliked = blog.dislikes.includes(userId);
 
-    } else if (action === 'comment') {
-      if (!comment || !comment.content || !comment.author) {
-        return NextResponse.json(
-          { error: 'Comment content and author are required' },
-          { status: 400 }
+      if (hasDisliked) {
+        // Un-dislike: Atomically pull from dislikes
+        await Blog.updateOne(
+          { _id: blog._id },
+          { $pull: { dislikes: userId } }
         );
+      } else {
+        // Dislike: Atomically push to dislikes and pull from likes if present (decrement count)
+        const updateOps = {
+          $addToSet: { dislikes: userId }
+        };
+        if (hasLiked) {
+          updateOps.$pull = { likes: userId };
+          updateOps.$inc = { likeCount: -1 };
+        }
+        await Blog.updateOne({ _id: blog._id }, updateOps);
       }
-
-      blog.comments.push({
-        author: comment.author,
-        content: comment.content,
-        createdAt: new Date(),
-        isApproved: true,
-      });
     } else {
       return NextResponse.json(
         { error: 'Invalid action' },
@@ -75,17 +78,14 @@ export async function POST(request, { params }) {
       );
     }
 
-    // Always update likeCount based on current likes array
-    blog.likeCount = blog.likes.length;
-
-    await blog.save();
+    // Fetch updated Blog to return current state
+    const updatedBlog = await Blog.findById(blog._id).select('likes dislikes likeCount');
 
     return NextResponse.json({
-      likes: blog.likes.length,
-      dislikes: blog.dislikes.length,
-      comments: blog.comments.filter(c => c.isApproved).sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)),
-      userLiked: blog.likes.includes(userId),
-      userDisliked: blog.dislikes.includes(userId),
+      likes: updatedBlog.likes.length,
+      dislikes: updatedBlog.dislikes.length,
+      userLiked: updatedBlog.likes.includes(userId),
+      userDisliked: updatedBlog.dislikes.includes(userId),
     });
   } catch (error) {
     console.error('Error handling engagement:', error);
@@ -96,7 +96,7 @@ export async function POST(request, { params }) {
   }
 }
 
-// GET - Get engagement data
+// GET - Get engagement data (Likes only)
 export async function GET(request, { params }) {
   try {
     await connectDB();
@@ -106,7 +106,7 @@ export async function GET(request, { params }) {
     const userId = searchParams.get('userId');
     const isAdmin = searchParams.get('isAdmin') === 'true';
 
-    const blog = await Blog.findOne({ slug }).select('likes dislikes comments');
+    const blog = await Blog.findOne({ slug }).select('likes dislikes');
 
     if (!blog) {
       return NextResponse.json(
@@ -115,20 +115,12 @@ export async function GET(request, { params }) {
       );
     }
 
-    const response = {
+    return NextResponse.json({
       likes: blog.likes.length,
-      dislikes: isAdmin ? blog.dislikes.length : undefined, // Hide from non-admins
-      comments: blog.comments.filter(c => c.isApproved).sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)),
+      dislikes: isAdmin ? blog.dislikes.length : undefined,
       userLiked: userId ? blog.likes.includes(userId) : false,
       userDisliked: userId ? blog.dislikes.includes(userId) : false,
-    };
-
-    // Include all comments for admins (including unapproved)
-    if (isAdmin) {
-      response.allComments = blog.comments.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-    }
-
-    return NextResponse.json(response);
+    });
   } catch (error) {
     console.error('Error fetching engagement:', error);
     return NextResponse.json(

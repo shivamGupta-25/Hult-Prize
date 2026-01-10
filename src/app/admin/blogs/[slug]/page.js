@@ -96,14 +96,20 @@ export default function EditBlogPage() {
 
   const fetchEngagement = async () => {
     try {
-      const response = await fetch(`/api/blogs/${slug}/engagement?isAdmin=true`)
-      const data = await response.json()
+      // Parallel fetch for engagement (likes/dislikes) and comments
+      const [engagementResponse, commentsResponse] = await Promise.all([
+        fetch(`/api/blogs/${slug}/engagement?isAdmin=true`),
+        fetch(`/api/blogs/${slug}/comments?isAdmin=true`)
+      ])
 
-      if (response.ok) {
+      const engagementData = await engagementResponse.json()
+      const commentsData = await commentsResponse.json()
+
+      if (engagementResponse.ok && commentsResponse.ok) {
         setEngagement({
-          likes: data.likes || 0,
-          dislikes: data.dislikes || 0,
-          comments: data.allComments || [],
+          likes: engagementData.likes || 0,
+          dislikes: engagementData.dislikes || 0,
+          comments: Array.isArray(commentsData) ? commentsData : [],
         })
       }
     } catch (error) {

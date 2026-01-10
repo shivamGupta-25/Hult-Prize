@@ -34,8 +34,8 @@ import DOMPurify from 'isomorphic-dompurify'
 export default function BlogClient({ initialBlog, slug, recommendedBlogs = [] }) {
   const [blog, setBlog] = useState(initialBlog)
   const [loading, setLoading] = useState(!initialBlog)
-  const [engagement, setEngagement] = useState({ likes: 0, comments: [], userLiked: false, userDisliked: false })
-  // removed recommendedBlogs state
+  const [engagement, setEngagement] = useState({ likes: 0, likesList: [], userLiked: false, userDisliked: false }) // likesList not needed in UI but good to match structure if needed, actually removed from UI usage
+  const [comments, setComments] = useState([])
   const [comment, setComment] = useState('')
   const [commentAuthor, setCommentAuthor] = useState('')
   const [submittingComment, setSubmittingComment] = useState(false)
@@ -63,6 +63,7 @@ export default function BlogClient({ initialBlog, slug, recommendedBlogs = [] })
         }
       }
       fetchEngagement()
+      fetchComments()
       // fetchRecommendedBlogs() removed
     }
   }, [slug]) // Keep logic simple; if slug changes, re-run
@@ -121,6 +122,19 @@ export default function BlogClient({ initialBlog, slug, recommendedBlogs = [] })
     }
   }
 
+  const fetchComments = async () => {
+    try {
+      const response = await fetch(`/api/blogs/${slug}/comments`)
+      const data = await response.json()
+
+      if (response.ok) {
+        setComments(data)
+      }
+    } catch (error) {
+      console.error('Error fetching comments:', error)
+    }
+  }
+
   // fetchRecommendedBlogs removed
 
   const handleEngagement = async (action) => {
@@ -157,26 +171,19 @@ export default function BlogClient({ initialBlog, slug, recommendedBlogs = [] })
 
     setSubmittingComment(true)
     try {
-      const response = await fetch(`/api/blogs/${slug}/engagement`, {
+      const response = await fetch(`/api/blogs/${slug}/comments`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          action: 'comment',
-          userId,
-          comment: {
-            author: commentAuthor,
-            content: comment,
-          },
+          author: commentAuthor,
+          content: comment,
         }),
       })
 
       const data = await response.json()
 
       if (response.ok) {
-        setEngagement(prev => ({
-          ...prev,
-          comments: data.comments,
-        }))
+        setComments(prev => [data, ...prev])
         setComment('')
         setCommentAuthor('')
         toast.success('Comment added successfully')
@@ -340,7 +347,7 @@ export default function BlogClient({ initialBlog, slug, recommendedBlogs = [] })
           <div className="mb-12">
             <h2 className="text-2xl font-bold mb-6 flex items-center gap-2">
               <MessageCircle className="h-6 w-6" />
-              Comments ({engagement.comments?.length || 0})
+              Comments ({comments.length || 0})
             </h2>
 
             {/* Comment Form */}
@@ -372,10 +379,10 @@ export default function BlogClient({ initialBlog, slug, recommendedBlogs = [] })
 
             {/* Comments List */}
             <div className="space-y-4">
-              {engagement.comments?.length === 0 ? (
+              {comments.length === 0 ? (
                 <p className="text-muted-foreground text-center py-8">No comments yet. Be the first to comment!</p>
               ) : (
-                engagement.comments?.map((comment, index) => (
+                comments.map((comment, index) => (
                   <Card key={index}>
                     <CardContent>
                       <div className="flex items-start gap-4">

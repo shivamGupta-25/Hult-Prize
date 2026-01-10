@@ -1,26 +1,5 @@
 import mongoose from 'mongoose';
 
-const CommentSchema = new mongoose.Schema({
-  author: {
-    type: String,
-    required: true,
-    trim: true,
-  },
-  content: {
-    type: String,
-    required: true,
-    trim: true,
-  },
-  createdAt: {
-    type: Date,
-    default: Date.now,
-  },
-  isApproved: {
-    type: Boolean,
-    default: true,
-  },
-});
-
 const BlogSchema = new mongoose.Schema(
   {
     title: {
@@ -74,10 +53,6 @@ const BlogSchema = new mongoose.Schema(
       type: Number,
       default: 0,
     },
-    comments: {
-      type: [CommentSchema],
-      default: [],
-    },
     views: {
       type: Number,
       default: 0,
@@ -113,6 +88,3 @@ BlogSchema.pre('save', function () {
 const Blog = mongoose.models.Blog || mongoose.model('Blog', BlogSchema);
 
 export default Blog;
-
-
-
