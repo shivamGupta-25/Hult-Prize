@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import Image from 'next/image';
-import { Menu, Home, Users, Mail, Book } from 'lucide-react';
+import { Menu, Home, Users, Mail, Book, BookOpen } from 'lucide-react';
 import { Sheet, SheetContent, SheetTrigger, SheetTitle } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -31,6 +31,7 @@ const Nav = () => {
   const navLinks = [
     { path: '/', label: 'Home', icon: Home },
     { path: '/blogs', label: 'Blogs', icon: Book },
+    { path: '/praxeis', label: 'Praxeis', icon: BookOpen },
     { path: '/team', label: 'Team', icon: Users },
     { path: '/contact', label: 'Contact', icon: Mail },
   ];

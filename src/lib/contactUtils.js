@@ -55,10 +55,11 @@ export const formatAddressString = (address) => {
  * @returns {Object} - Object containing developerInfo, loading state, and fallback name
  */
 export const useDeveloperInfo = () => {
-  const [developerInfo, setDeveloperInfo] = useState(null);
+  const [developerInfo, setDeveloperInfo] = useState({ credit: FALLBACK_NAME, linkedin: null });
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    let isMounted = true;
     const controller = new AbortController();
 
     const fetchDeveloperInfo = async () => {
@@ -72,19 +73,26 @@ export const useDeveloperInfo = () => {
         }
 
         const data = await response.json();
-        setDeveloperInfo(data);
+        if (isMounted) {
+          setDeveloperInfo(data);
+        }
       } catch (err) {
-        if (err.name !== "AbortError") {
-          console.error("Developer info fetch failed:", err);
+        if (err.name !== "AbortError" && isMounted) {
+          // Silent fallback to avoid loud errors in console
           setDeveloperInfo({ credit: FALLBACK_NAME, linkedin: null });
         }
       } finally {
-        setLoading(false);
+        if (isMounted) {
+          setLoading(false);
+        }
       }
     };
 
     fetchDeveloperInfo();
-    return () => controller.abort();
+    return () => {
+      isMounted = false;
+      controller.abort();
+    };
   }, []);
 
   return { developerInfo, loading, fallbackName: FALLBACK_NAME };

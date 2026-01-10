@@ -49,18 +49,26 @@ const Footer = () => {
               </li>
               <li>
                 <Link
-                  href="/team"
+                  href="/praxeis"
                   className="text-muted-foreground hover:text-primary transition-colors"
                 >
-                  Team
+                  Praxeis
                 </Link>
               </li>
               <li>
                 <Link
-                  href="/contact"
+                  href="/events"
                   className="text-muted-foreground hover:text-primary transition-colors"
                 >
-                  Contact
+                  Events
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/team"
+                  className="text-muted-foreground hover:text-primary transition-colors"
+                >
+                  Team
                 </Link>
               </li>
             </ul>
