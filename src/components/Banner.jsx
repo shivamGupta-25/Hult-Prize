@@ -72,7 +72,7 @@ export default function Banner() {
       <div className="absolute inset-0 flex items-center justify-center z-10">
         <div className="text-center px-6 max-w-6xl">
           {/* Main Heading with Gradient */}
-          <h1 className="relative inline-block mb-6">
+          <h1 className="relative mb-6">
             <span className="block text-7xl md:text-8xl lg:text-9xl font-black text-transparent bg-clip-text bg-linear-to-r from-white via-purple-200 to-rose-200 mb-2 tracking-tighter leading-none animate-fade-in">
               Hult Prize
             </span>
@@ -109,8 +109,8 @@ export default function Banner() {
             key={index}
             onClick={() => setCurrentSlide(index)}
             className={`transition-all duration-300 rounded-full ${currentSlide === index
-                ? 'w-6 h-1.5 sm:w-7 sm:h-2 md:w-8 md:h-2 bg-white'
-                : 'w-1.5 h-1.5 sm:w-2 sm:h-2 bg-white/40 hover:bg-white/60'
+              ? 'w-6 h-1.5 sm:w-7 sm:h-2 md:w-8 md:h-2 bg-white'
+              : 'w-1.5 h-1.5 sm:w-2 sm:h-2 bg-white/40 hover:bg-white/60'
               }`}
             aria-label={`Go to slide ${index + 1}`}
           />
