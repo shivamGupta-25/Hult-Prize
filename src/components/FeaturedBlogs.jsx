@@ -108,7 +108,7 @@ export const FeaturedBlogs = async () => {
                     <div className="flex items-center gap-3 text-xs text-muted-foreground mb-4 pb-4 border-b border-border/50">
                       <div className="flex items-center gap-1.5">
                         <User className="h-3.5 w-3.5" />
-                        <span className="truncate max-w-[100px]">{blog.author}</span>
+                        <span className="truncate max-w-25">{blog.author}</span>
                       </div>
                       {blog.publishedAt && (
                         <>
