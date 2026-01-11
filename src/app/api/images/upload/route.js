@@ -1,8 +1,22 @@
 import { NextResponse } from 'next/server';
+import { cookies } from 'next/headers';
+import { verifySession } from '@/lib/auth';
 
 // POST - Handle image upload (base64 encoding for simplicity)
 export async function POST(request) {
   try {
+    // Verify admin authentication
+    const cookieStore = await cookies();
+    const token = cookieStore.get('admin-session')?.value;
+    const isVerified = await verifySession(token);
+
+    if (!isVerified) {
+      return NextResponse.json(
+        { error: 'Unauthorized - Admin access required' },
+        { status: 401 }
+      );
+    }
+
     const body = await request.json();
     const { image } = body;
 
@@ -39,6 +53,3 @@ export async function POST(request) {
     );
   }
 }
-
-
-

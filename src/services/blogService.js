@@ -290,4 +290,19 @@ export const deleteBlog = async (slug) => {
   return true;
 };
 
+export const deleteAllBlogs = async () => {
+  await connectDB();
+
+  // CASCADE DELETE: Delete all comments first
+  await Comment.deleteMany({});
+
+  // Delete all blogs
+  const result = await Blog.deleteMany({});
+
+  return {
+    success: true,
+    deletedCount: result.deletedCount
+  };
+};
+
 // Helper removed in favor of import from @/lib/serializers

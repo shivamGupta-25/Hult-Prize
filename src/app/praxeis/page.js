@@ -144,7 +144,7 @@ function FlipCard({ edition }) {
             <p className="text-xs text-muted-foreground uppercase tracking-widest mb-4">
               {edition.volume}
             </p>
-            <p className="text-sm text-foreground/80 font-medium line-clamp-4 leading-relaxed">
+            <p className="text-sm text-foreground/80 font-medium line-clamp-4 leading-relaxed pointer-events-none">
               {edition.theme}
             </p>
           </div>

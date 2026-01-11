@@ -43,6 +43,7 @@ import {
   Search,
   LogOut,
   Sparkles,
+  Trash,
 } from 'lucide-react'
 import { format } from 'date-fns'
 import { toast } from 'sonner'
@@ -54,6 +55,7 @@ export default function AdminBlogsPage() {
   const [loading, setLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState('')
   const [deleteDialog, setDeleteDialog] = useState({ open: false, blog: null })
+  const [deleteAllDialog, setDeleteAllDialog] = useState(false)
   const [statusFilter, setStatusFilter] = useState('all') // all | published | draft
   const [page, setPage] = useState(1)
   const pageSize = 8
@@ -175,6 +177,27 @@ export default function AdminBlogsPage() {
     }
   }
 
+  const handleDeleteAll = async () => {
+    try {
+      const response = await fetch('/api/blogs/delete-all', {
+        method: 'DELETE',
+      })
+
+      const data = await response.json()
+
+      if (response.ok) {
+        toast.success(`Successfully deleted ${data.deletedCount} blog(s) and all associated data`)
+        setDeleteAllDialog(false)
+        fetchBlogs()
+      } else {
+        toast.error(data.error || 'Failed to delete all blog data')
+      }
+    } catch (error) {
+      console.error('Error deleting all blogs:', error)
+      toast.error('Failed to delete all blog data')
+    }
+  }
+
 
   // Derived data: filter and paginate on the client
   const { paginatedBlogs, totalPages, totalFiltered } = useMemo(() => {
@@ -218,6 +241,14 @@ export default function AdminBlogsPage() {
               <Button variant="outline" onClick={handleLogout}>
                 <LogOut className="mr-2 h-4 w-4" />
                 Logout
+              </Button>
+              <Button
+                variant="destructive"
+                onClick={() => setDeleteAllDialog(true)}
+                title="Delete all blog data"
+              >
+                <Trash className="mr-2 h-4 w-4" />
+                Delete All
               </Button>
               <Link href="/admin/blogs/new">
                 <Button>
@@ -486,6 +517,36 @@ export default function AdminBlogsPage() {
               <AlertDialogCancel>Cancel</AlertDialogCancel>
               <AlertDialogAction onClick={handleDelete} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
                 Delete
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+
+        {/* Delete All Dialog */}
+        <AlertDialog open={deleteAllDialog} onOpenChange={setDeleteAllDialog}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Delete All Blog Data?</AlertDialogTitle>
+              <div className="space-y-2 text-sm text-muted-foreground">
+                <div className="font-semibold text-destructive">
+                  ⚠️ WARNING: This is a destructive action!
+                </div>
+                <div>
+                  This will permanently delete <strong>ALL</strong> blogs ({totalFiltered} total) and all associated comments.
+                  This action cannot be undone.
+                </div>
+                <div className="text-sm">
+                  Are you absolutely sure you want to proceed?
+                </div>
+              </div>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <AlertDialogAction
+                onClick={handleDeleteAll}
+                className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              >
+                Yes, Delete All
               </AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>

@@ -1,4 +1,6 @@
 import { NextResponse } from 'next/server';
+import { cookies } from 'next/headers';
+import { verifySession } from '@/lib/auth';
 import connectDB from '@/lib/mongodb';
 import Comment from '@/models/Comment';
 import Blog from '@/models/Blog';
@@ -6,6 +8,18 @@ import Blog from '@/models/Blog';
 // PUT - Update comment (approve/unapprove or edit)
 export async function PUT(request, { params }) {
   try {
+    // Verify admin authentication
+    const cookieStore = await cookies();
+    const token = cookieStore.get('admin-session')?.value;
+    const isVerified = await verifySession(token);
+
+    if (!isVerified) {
+      return NextResponse.json(
+        { error: 'Unauthorized - Admin access required' },
+        { status: 401 }
+      );
+    }
+
     await connectDB();
 
     const { commentId } = await params; // params contains slug too, but we just need commentId
@@ -55,6 +69,18 @@ export async function PUT(request, { params }) {
 // DELETE - Delete a comment
 export async function DELETE(request, { params }) {
   try {
+    // Verify admin authentication
+    const cookieStore = await cookies();
+    const token = cookieStore.get('admin-session')?.value;
+    const isVerified = await verifySession(token);
+
+    if (!isVerified) {
+      return NextResponse.json(
+        { error: 'Unauthorized - Admin access required' },
+        { status: 401 }
+      );
+    }
+
     await connectDB();
 
     const { commentId } = await params;

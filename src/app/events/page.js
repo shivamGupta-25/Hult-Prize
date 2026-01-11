@@ -387,7 +387,7 @@ function EventDetailDialog({ event, open, onClose }) {
               <img
                 src={image}
                 alt={header.title}
-                className="w-auto h-auto max-w-full max-h-[500px] object-contain rounded-sm shadow-lg"
+                className="w-auto h-auto max-w-full max-h-125 object-contain rounded-sm shadow-lg"
                 onError={() => setImageError(true)}
                 loading="lazy"
                 style={{ aspectRatio: 'auto' }}
@@ -587,7 +587,7 @@ function SessionCard({ session, sessionIdx }) {
             <img
               src={session.image}
               alt={session.title}
-              className="w-auto h-auto max-w-full max-h-[280px] object-contain rounded-lg shadow-lg"
+              className="w-auto h-auto max-w-full max-h-70 object-contain rounded-lg shadow-lg"
               onError={() => setSessionImageError(true)}
               loading="lazy"
               style={{ aspectRatio: 'auto' }}
@@ -642,7 +642,7 @@ function DayCard({ day, idx }) {
             <img
               src={day.image}
               alt={`${day.day} - ${day.theme || ''}`}
-              className="w-auto h-auto max-w-full max-h-[350px] object-contain rounded-lg shadow-lg"
+              className="w-auto h-auto max-w-full max-h-87.5 object-contain rounded-lg shadow-lg"
               onError={() => setImageError(true)}
               loading="lazy"
               style={{ aspectRatio: 'auto' }}
@@ -731,7 +731,7 @@ function SubEventCard({ subEvent, idx }) {
             <img
               src={subEvent.image}
               alt={subEvent.name}
-              className="w-auto h-auto max-w-full max-h-[350px] object-contain rounded-sm shadow-lg"
+              className="w-auto h-auto max-w-full max-h-87.5 object-contain rounded-sm shadow-lg"
               onError={() => setImageError(true)}
               loading="lazy"
               style={{ aspectRatio: 'auto' }}
