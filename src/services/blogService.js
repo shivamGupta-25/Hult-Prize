@@ -18,17 +18,21 @@ export const getBlogs = cache(async (params = {}) => {
     published // boolean or undefined
   } = params;
 
-  const skip = (page - 1) * limit;
+  // Sanitize and validate inputs
+  const pageNumber = Math.max(1, parseInt(page) || 1);
+  const limitNumber = Math.max(1, Math.min(50, parseInt(limit) || 10)); // Cap limit at 50 to prevent DoS
+  const skip = (pageNumber - 1) * limitNumber;
 
   // Build match stage (query)
   const matchStage = {};
 
+  // Strict boolean check for published status to prevent object injection
   if (published !== undefined) {
-    matchStage.isPublished = published;
+    matchStage.isPublished = String(published) === 'true';
   }
 
   if (search) {
-    matchStage.$text = { $search: search };
+    matchStage.$text = { $search: String(search) };
   }
 
   // Aggregation Pipeline
@@ -50,12 +54,15 @@ export const getBlogs = cache(async (params = {}) => {
   } else if (search) {
     sortStage.score = { $meta: 'textScore' };
   } else {
-    sortStage[sortBy] = order === 'asc' ? 1 : -1;
+    // Whitelist allowed sort fields to prevent injection
+    const allowedSortFields = ['publishedAt', 'title', 'views'];
+    const sortField = allowedSortFields.includes(sortBy) ? sortBy : 'publishedAt';
+    sortStage[sortField] = order === 'asc' ? 1 : -1;
   }
 
   pipeline.push({ $sort: sortStage });
   pipeline.push({ $skip: skip });
-  pipeline.push({ $limit: parseInt(limit) });
+  pipeline.push({ $limit: limitNumber });
   pipeline.push({
     $project: {
       content: 0, // exclude content for list view
@@ -82,7 +89,8 @@ export const getBlogs = cache(async (params = {}) => {
 
 export const getBlogBySlug = cache(async (slug) => {
   await connectDB();
-  const blog = await Blog.findOne({ slug }).lean();
+  const safeSlug = String(slug);
+  const blog = await Blog.findOne({ slug: safeSlug }).lean();
   if (!blog) return null;
   return serializeBlog(blog);
 });
@@ -92,7 +100,7 @@ export const getBlogBySlug = cache(async (slug) => {
 // Depending on deployment (Vercel serverless), awaiting might be safer to ensure execution before freeze.
 export const incrementBlogViews = async (slug) => {
   await connectDB();
-  await Blog.updateOne({ slug }, { $inc: { views: 1 } });
+  await Blog.updateOne({ slug: String(slug) }, { $inc: { views: 1 } });
 };
 
 export const getFeaturedBlogs = cache(async () => {
@@ -138,9 +146,10 @@ export const getHeroBlog = cache(async () => {
 
 export const getRecommendedBlogs = cache(async (currentSlug) => {
   await connectDB();
+  const safeSlug = String(currentSlug);
 
   const [results] = await Blog.aggregate([
-    { $match: { isPublished: true, slug: { $ne: currentSlug } } },
+    { $match: { isPublished: true, slug: { $ne: safeSlug } } },
     {
       $facet: {
         latest: [
@@ -222,12 +231,14 @@ export const createBlog = async (data) => {
 
 export const updateBlog = async (currentSlug, data) => {
   await connectDB();
-  const blog = await Blog.findOne({ slug: currentSlug });
+  const safeCurrentSlug = String(currentSlug);
+  const blog = await Blog.findOne({ slug: safeCurrentSlug });
   if (!blog) return null;
 
   // Handle slug updates
   if (data.slug && data.slug !== blog.slug) {
-    const existingBlog = await Blog.findOne({ slug: data.slug });
+    const safeNewSlug = String(data.slug);
+    const existingBlog = await Blog.findOne({ slug: safeNewSlug });
     if (existingBlog && existingBlog._id.toString() !== blog._id.toString()) {
       throw new Error('A blog with this slug already exists');
     }
@@ -278,7 +289,8 @@ export const deleteBlog = async (slug) => {
   await connectDB();
 
   // Find the blog first to ensure it exists
-  const blog = await Blog.findOne({ slug });
+  const safeSlug = String(slug);
+  const blog = await Blog.findOne({ slug: safeSlug });
   if (!blog) return false;
 
   // CASCADE DELETE: Delete all comments associated with this blog

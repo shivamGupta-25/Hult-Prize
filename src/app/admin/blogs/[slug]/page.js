@@ -97,9 +97,10 @@ export default function EditBlogPage() {
   const fetchEngagement = async () => {
     try {
       // Parallel fetch for engagement (likes/dislikes) and comments
+      // Admin status is now automatically verified via session cookie on the backend
       const [engagementResponse, commentsResponse] = await Promise.all([
-        fetch(`/api/blogs/${slug}/engagement?isAdmin=true`),
-        fetch(`/api/blogs/${slug}/comments?isAdmin=true`)
+        fetch(`/api/blogs/${slug}/engagement`),
+        fetch(`/api/blogs/${slug}/comments`)
       ])
 
       const engagementData = await engagementResponse.json()

@@ -1,4 +1,6 @@
 import { NextResponse } from 'next/server';
+import { cookies } from 'next/headers';
+import { verifySession } from '@/lib/auth';
 import connectDB from '@/lib/mongodb';
 import Blog from '@/models/Blog';
 
@@ -93,7 +95,7 @@ export async function POST(request, { params }) {
   }
 }
 
-// GET - Get engagement data (Likes only)
+// GET - Get engagement data (Likes only, dislikes only for authenticated admins)
 export async function GET(request, { params }) {
   try {
     await connectDB();
@@ -101,7 +103,11 @@ export async function GET(request, { params }) {
     const { slug } = await params;
     const { searchParams } = new URL(request.url);
     const userId = searchParams.get('userId');
-    const isAdmin = searchParams.get('isAdmin') === 'true';
+
+    // SECURE: Verify admin status via session cookie instead of query parameter
+    const cookieStore = await cookies();
+    const token = cookieStore.get('admin-session')?.value;
+    const isAdmin = await verifySession(token);
 
     const blog = await Blog.findOne({ slug }).select('likes dislikes');
 
