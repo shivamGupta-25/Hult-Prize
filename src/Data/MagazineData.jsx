@@ -38,7 +38,7 @@ const magazineData = {
       },
 
       assets: {
-        coverImage: "/MagazinePoster/2025-edition.png",
+        coverImage: "/MagazinePoster/profile pic.jpg",
         downloadLink: "/MagazinePDF/2025-edition.pdf",
       },
     },
