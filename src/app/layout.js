@@ -18,7 +18,7 @@ const geistMono = Geist_Mono({
 
 export const metadata = {
   icons: {
-    icon: "/Hult-Prize_Logo.png",
+    icon: "/favicon.png",
   },
   title: "Hult Prize - Hansraj College",
   description: "Empowering student entrepreneurs to solve the world's toughest challenges.",

@@ -57,11 +57,11 @@ const Nav = () => {
             aria-label="Hult Prize Home"
           >
             <Image
-              src="/Hult-Prize_Logo.png"
+              src="/Hult_Prize_Logo_NEW.png"
               alt="Hult Prize Logo"
-              width={48}
-              height={48}
-              className="h-10 w-10 md:h-12 md:w-12 transition-transform duration-300 group-hover:scale-110"
+              width={2644}
+              height={1495}
+              className="h-10 md:h-12 w-auto object-contain transition-transform duration-300 group-hover:scale-110"
               priority
             />
             <div className="flex flex-col">
@@ -121,11 +121,11 @@ const Nav = () => {
                       className="flex items-center gap-3 group"
                     >
                       <Image
-                        src="/Hult-Prize_Logo.png"
+                        src="/Hult_Prize_Logo_NEW.png"
                         alt="Hult Prize Logo"
-                        width={40}
-                        height={40}
-                        className="h-10 w-10 transition-transform duration-200 group-hover:scale-105"
+                        width={2644}
+                        height={1495}
+                        className="h-9 w-auto object-contain transition-transform duration-200 group-hover:scale-105"
                       />
                       <div className="flex flex-col">
                         <span className="text-lg font-bold text-foreground leading-tight">

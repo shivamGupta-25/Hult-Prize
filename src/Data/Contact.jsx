@@ -10,7 +10,7 @@ const contactData = {
   locationUrl: "https://maps.app.goo.gl/Bzb8ZoeMLy6ZcEfc7",
 
   contactInfo: {
-    email: "hultprizehansraj@gmail.com",
+    email: "hultteamcontact@gmail.com",
     phone: "+91-9518233833",
     address: {
       line1: "Hult Prize - Hansraj College",
@@ -29,12 +29,12 @@ const contactData = {
   socialLinks: [
     {
       platform: "LinkedIn",
-      url: "#",
+      url: "https://www.linkedin.com/search/results/all/?fetchDeterministicClustersOnly=true&heroEntityKey=urn%3Ali%3Aorganization%3A79705476&keywords=hult%20prize%2C%20hansraj&origin=RICH_QUERY_SUGGESTION&position=2&sid=r2P",
       icon: "Linkedin"
     },
     {
       platform: "Instagram",
-      url: "#",
+      url: "https://www.instagram.com/hult.prize.hansraj/",
       icon: "Instagram"
     }
   ]
