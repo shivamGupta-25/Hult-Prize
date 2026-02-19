@@ -11,12 +11,17 @@ import { cn } from '@/lib/utils';
 import { Separator } from '@/components/ui/separator';
 import { mottoData } from '@/Data/SiteData';
 import { ModeToggle } from '@/components/mode-toggle';
+import { useTheme } from 'next-themes';
 
 const Nav = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
   const pathname = usePathname();
+  const { resolvedTheme } = useTheme();
+  const logoSrc = mounted && resolvedTheme === 'light'
+    ? '/Hult_Prize_LogoDark_NEW.png'
+    : '/Hult_Prize_Logo_NEW.png';
 
   // Ensure component is mounted before applying scroll-based styles to prevent hydration mismatch
   useEffect(() => {
@@ -57,7 +62,7 @@ const Nav = () => {
             aria-label="Hult Prize Home"
           >
             <Image
-              src="/Hult_Prize_Logo_NEW.png"
+              src={logoSrc}
               alt="Hult Prize Logo"
               width={2644}
               height={1495}
@@ -121,7 +126,7 @@ const Nav = () => {
                       className="flex items-center gap-3 group"
                     >
                       <Image
-                        src="/Hult_Prize_Logo_NEW.png"
+                        src={logoSrc}
                         alt="Hult Prize Logo"
                         width={2644}
                         height={1495}

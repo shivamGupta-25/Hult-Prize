@@ -26,8 +26,8 @@ export default function EventCard({ event, index, onSelect }) {
         transform: inView ? "translateY(0) scale(1)" : "translateY(20px) scale(0.98)",
         transition: `opacity 0.45s ease ${index * 70}ms, transform 0.45s ease ${index * 70}ms`,
         boxShadow: hovered
-          ? "0 20px 60px -10px rgba(0,0,0,0.3), 0 0 0 1px var(--color-primary)"
-          : "0 1px 3px rgba(0,0,0,0.1)",
+          ? "0 20px 60px -10px color-mix(in oklch, var(--color-foreground) 25%, transparent), 0 0 0 1px var(--color-primary)"
+          : "0 1px 3px color-mix(in oklch, var(--color-foreground) 8%, transparent)",
       }}
     >
       {/* Image area */}

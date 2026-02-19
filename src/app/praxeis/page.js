@@ -115,7 +115,7 @@ function FlipCard({ edition }) {
         {/* Book Cover */}
         <div className="absolute inset-0 w-full h-full rounded-r-lg rounded-l-sm shadow-2xl overflow-hidden bg-card">
           {/* Book Spine visual trick */}
-          <div className="absolute left-0 top-0 bottom-0 w-2 lg:w-3 bg-linear-to-r from-gray-800 to-gray-600 z-20 opacity-80" />
+          <div className="absolute left-0 top-0 bottom-0 w-2 lg:w-3 bg-linear-to-r from-foreground/70 to-foreground/40 z-20 opacity-80" />
           <div className="absolute inset-0 pl-1 h-full w-full">
             <Image
               src={edition.assets.coverImage}
@@ -190,12 +190,12 @@ function EditionCard({ edition, index }) {
           className="object-contain p-2 transition-transform duration-700 group-hover:scale-105"
         />
         {/* Overlay on hover */}
-        <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center gap-4">
+        <div className="absolute inset-0 bg-foreground/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center gap-4">
           <Link
             href={edition.assets.downloadLink}
             target="_blank"
             download
-            className="p-3 bg-white/20 hover:bg-white/30 backdrop-blur-md rounded-full text-white transition-all transform hover:scale-110"
+            className="p-3 bg-background/20 hover:bg-background/30 backdrop-blur-md rounded-full text-background transition-all transform hover:scale-110"
             title="Download PDF"
           >
             <ArrowDownToLine size={24} />
@@ -203,7 +203,7 @@ function EditionCard({ edition, index }) {
           <Link
             href={edition.assets.downloadLink}
             target="_blank"
-            className="p-3 bg-primary hover:bg-primary/90 rounded-full text-white transition-all transform hover:scale-110 shadow-lg"
+            className="p-3 bg-primary hover:bg-primary/90 rounded-full text-primary-foreground transition-all transform hover:scale-110 shadow-lg"
             title="Read Online"
           >
             <BookOpen size={24} />

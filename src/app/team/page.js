@@ -32,7 +32,7 @@ export default function Teams() {
         {/* Header */}
         <div className="text-center space-y-3 sm:space-y-4">
           <h1 className="text-4xl md:text-6xl font-black text-foreground mb-4">
-            <span className="text-white">Meet Our</span> <span className="text-primary">Team</span>
+            <span className="text-foreground">Meet Our</span> <span className="text-primary">Team</span>
           </h1>
           <p className="text-base sm:text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto px-4">
             The passionate individuals driving innovation and change at Hult Prize.

@@ -41,7 +41,7 @@ export default function Contact() {
           <div className="text-center mb-12">
             {title && (
               <h1 className="text-4xl md:text-6xl font-black text-foreground mb-4">
-                <span className="text-white">Contact</span> <span className="text-primary">Us</span>
+                <span className="text-foreground">Contact</span> <span className="text-primary">Us</span>
               </h1>
             )}
             {description && (
