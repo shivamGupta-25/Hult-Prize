@@ -1,115 +1,15 @@
+// Keys are year strings. Add a new year key to introduce a new cohort of events.
+
 export const eventsByYear = {
   "2025": [
     {
-      id: "alchemy-2025",
-      image: "/Events/Alchemy/Day-1Poster.jpg",
-      header: {
-        title: "Alchemy",
-        subtitle: "The Ultimate Speaker Session",
-        year: "2025",
-        type: "Speaker Series",
-        badge: "Inspiration"
-      },
-      about: {
-        description:
-          "A multidisciplinary speaker session showcasing diverse professional journeys.",
-        vision:
-          "To bridge classroom learning with real-world exposure.",
-        mission: [
-          "Connect academics with industry realities",
-          "Inspire through lived professional journeys",
-          "Encourage active engagement and curiosity"
-        ]
-      },
-      logistics: {
-        mode: "Offline",
-        venue: "Hansraj College Auditorium, New Delhi",
-        duration: "2 Days",
-        dates: "November 10-11, 2025"
-      },
-      stats: {
-        registrations: "300+",
-        reach: "600,000+ Instagram Impressions, 10,000+ WhatsApp Reach",
-        partners: "4 Strategic Partners"
-      },
-      content: {
-        type: "schedule",
-        details: "11-speaker multidisciplinary panel",
-        categories: [
-          { title: "Industry & Economic Experts", count: 4 },
-          { title: "Social Impact Leaders", count: 3 },
-          { title: "Strategic Storytellers", count: 2 },
-          { title: "Performing Artist", count: 1 }
-        ],
-        agenda: [
-          {
-            day: "Day 1",
-            image: "/Events/Alchemy/Day-1Poster.jpg"
-          },
-          {
-            day: "Day 2",
-            image: "/Events/Alchemy/Day-2Poster.jpg"
-          }
-        ]
-      }
-    }
-  ],
-
-  "2024": [
-    {
-      id: "ranneeti-2.0",
-      image: "/Events/Ranneeti/Ranneeti2.0_Posters/MainPoster.png",
-      header: {
-        title: "Ranneeti 2.0",
-        year: "2024",
-        type: "Dual-Domain Strategic Conclave",
-        badge: "Strategy & Finance"
-      },
-      about: {
-        description:
-          "A dual-domain conclave testing consulting strategy and trading literacy.",
-        vision:
-          "To test business competencies across consulting and financial simulation tracks.",
-        mission: [
-          "Test strategic problem-solving and pitching",
-          "Navigate market chaos through simulated trading"
-        ]
-      },
-      logistics: {
-        mode: "Hybrid",
-        venue: "Hansraj College",
-        dates: "Jan-Nov 2024",
-        duration: "Multi-stage"
-      },
-      content: {
-        type: "competitions",
-        subEvents: [
-          {
-            id: "gordian-knot-2",
-            name: "Gordian Knot 2.0",
-            tagline: "Case Study Competition",
-            image: "/Events/Ranneeti/Ranneeti2.0_Posters/GordianKnot2.0Poster.jpg"
-          },
-          {
-            id: "trade-a-thon",
-            name: "Trade-a-thon",
-            tagline: "Mock Stock Simulation",
-            image: "/Events/Ranneeti/Ranneeti2.0_Posters/Trade-a-thonPoster.jpg"
-          }
-        ]
-      }
-    }
-  ],
-
-  "2023": [
-    {
-      id: "careercon-2023",
+      id: "careercon-2025",
       image: "/Events/CareerCon/MainPoster.jpg",
       header: {
         title: "CareerCon",
-        year: "2023",
+        year: "2025",
         type: "Virtual Workshop Series",
-        badge: "Skill Building"
+        badge: "Skill Building",
       },
       about: {
         description:
@@ -119,14 +19,14 @@ export const eventsByYear = {
         mission: [
           "Build Foundations: Transition participants from passive opportunity seekers to proactive career builders.",
           "Essential Toolkit: Provide knowledge on optimizing LinkedIn profiles, crafting compelling CVs, and sector analysis.",
-          "Technical Mastery: Build foundations in Excel functionalities and financial modeling."
-        ]
+          "Technical Mastery: Build foundations in Excel functionalities and financial modeling.",
+        ],
       },
       logistics: {
         mode: "Virtual Workshop via Google Meet",
         venue: "Online",
         duration: "3 Days",
-        dates: "2023"
+        dates: "2025",
       },
       stats: {
         participants: "400+",
@@ -135,8 +35,8 @@ export const eventsByYear = {
         extra: "5 Speakers, 6 Sessions",
         demographics: {
           firstYear: "68.7%",
-          hansrajStudents: "67.5%"
-        }
+          hansrajStudents: "67.5%",
+        },
       },
       content: {
         type: "schedule",
@@ -152,16 +52,16 @@ export const eventsByYear = {
                 focus: [
                   "Understanding highest return-to-effort strategies",
                   "Simon Sinek's Golden Circle",
-                  "Leveraging LinkedIn for networking"
-                ]
+                  "Leveraging LinkedIn for networking",
+                ],
               },
               {
                 title: "CV Building",
                 speaker: "Suhani",
                 image: "/Events/CareerCon/CVBuilding_Poster.jpg",
-                focus: ["Crafting compelling CVs for job applications"]
-              }
-            ]
+                focus: ["Crafting compelling CVs for job applications"],
+              },
+            ],
           },
           {
             day: "Day 2",
@@ -172,16 +72,16 @@ export const eventsByYear = {
                 speaker: "Lokesh Balpandey",
                 focus: [
                   "Analyzing sector size and growth drivers",
-                  "Cost drivers and future projections"
-                ]
+                  "Cost drivers and future projections",
+                ],
               },
               {
                 title: "Excel Upskilling",
                 speaker: "Chinmaya Amte",
                 image: "/Events/CareerCon/Excel Upskilling_Poster.jpg",
-                focus: ["Hands-on Excel training"]
-              }
-            ]
+                focus: ["Hands-on Excel training"],
+              },
+            ],
           },
           {
             day: "Day 3",
@@ -191,7 +91,7 @@ export const eventsByYear = {
                 title: "Financial Modelling",
                 speaker: "Lokesh Balpandey",
                 image: "/Events/CareerCon/FinancialModelling_Poster.jpg",
-                focus: ["Model building and quarterly result analysis"]
+                focus: ["Model building and quarterly result analysis"],
               },
               {
                 title: "Ace Case Competition",
@@ -199,14 +99,111 @@ export const eventsByYear = {
                 image: "/Events/CareerCon/AceCaseCompetition_Poster.jpg",
                 focus: [
                   "Unit-level economics strategies",
-                  "PI Industries case analysis"
-                ]
-              }
-            ]
-          }
-        ]
-      }
+                  "PI Industries case analysis",
+                ],
+              },
+            ],
+          },
+        ],
+      },
     },
+    {
+      id: "alchemy-2025",
+      image: "/Events/Alchemy/Day-1Poster.jpg",
+      header: {
+        title: "Alchemy",
+        subtitle: "The Ultimate Speaker Session",
+        year: "2025",
+        type: "Speaker Series",
+        badge: "Inspiration",
+      },
+      about: {
+        description:
+          "A multidisciplinary speaker session showcasing diverse professional journeys.",
+        vision: "To bridge classroom learning with real-world exposure.",
+        mission: [
+          "Connect academics with industry realities",
+          "Inspire through lived professional journeys",
+          "Encourage active engagement and curiosity",
+        ],
+      },
+      logistics: {
+        mode: "Offline",
+        venue: "Hansraj College Auditorium, New Delhi",
+        duration: "2 Days",
+        dates: "November 10-11, 2025",
+      },
+      stats: {
+        registrations: "300+",
+        reach: "600,000+ Instagram Impressions, 10,000+ WhatsApp Reach",
+        partners: "4 Strategic Partners",
+      },
+      content: {
+        type: "schedule",
+        details: "11-speaker multidisciplinary panel",
+        categories: [
+          { title: "Performing Artist", count: 1 },
+          { title: "Strategic Storytellers", count: 2 },
+          { title: "Social Impact Leaders", count: 3 },
+          { title: "Industry & Economic Experts", count: 4 },
+        ],
+        agenda: [
+          { day: "Day 1", image: "/Events/Alchemy/Day-1Poster.jpg" },
+          { day: "Day 2", image: "/Events/Alchemy/Day-2Poster.jpg" },
+        ],
+      },
+    },
+  ],
+
+  "2024": [
+    {
+      id: "ranneeti-2.0",
+      image: "/Events/Ranneeti/Ranneeti2.0_Posters/MainPoster.png",
+      header: {
+        title: "Ranneeti 2.0",
+        year: "2024",
+        type: "Dual-Domain Strategic Conclave",
+        badge: "Strategy & Finance",
+      },
+      about: {
+        description:
+          "A dual-domain conclave testing consulting strategy and trading literacy.",
+        vision:
+          "To test business competencies across consulting and financial simulation tracks.",
+        mission: [
+          "Test strategic problem-solving and pitching",
+          "Navigate market chaos through simulated trading",
+        ],
+      },
+      logistics: {
+        mode: "Hybrid",
+        venue: "Hansraj College",
+        dates: "Jan-Nov 2024",
+        duration: "Multi-stage",
+      },
+      content: {
+        type: "competitions",
+        subEvents: [
+          {
+            id: "gordian-knot-2",
+            name: "Gordian Knot 2.0",
+            tagline: "Case Study Competition",
+            image:
+              "/Events/Ranneeti/Ranneeti2.0_Posters/GordianKnot2.0Poster.jpg",
+          },
+          {
+            id: "trade-a-thon",
+            name: "Trade-a-thon",
+            tagline: "Mock Stock Simulation",
+            image:
+              "/Events/Ranneeti/Ranneeti2.0_Posters/Trade-a-thonPoster.jpg",
+          },
+        ],
+      },
+    },
+  ],
+
+  "2023": [
     {
       id: "ranneeti-1.0",
       image: "/Events/Ranneeti/Ranneeti1.0_Posters/MainPoster.jpg",
@@ -214,7 +211,7 @@ export const eventsByYear = {
         title: "Ranneeti 1.0",
         year: "2023",
         type: "Strategic Conclave",
-        badge: "Competition"
+        badge: "Competition",
       },
       about: {
         description:
@@ -224,19 +221,19 @@ export const eventsByYear = {
         mission: [
           "Assess ethical reasoning in business decisions",
           "Test structured problem-solving abilities",
-          "Simulate pressure-driven strategic environments"
-        ]
+          "Simulate pressure-driven strategic environments",
+        ],
       },
       logistics: {
         mode: "Hybrid",
         venue: "Hansraj College, University of Delhi",
         dates: "October 17-22, 2023",
-        duration: "Multi-day"
+        duration: "Multi-day",
       },
       stats: {
         prizes: "₹15,000 per competition",
         rounds: 3,
-        participation: "Team-based"
+        participation: "Team-based",
       },
       content: {
         type: "competitions",
@@ -255,7 +252,7 @@ export const eventsByYear = {
                 mode: "Online",
                 date: "18 October 2023",
                 format: "20 MCQs",
-                outcome: "Top 8 teams qualify"
+                outcome: "Top 8 teams qualify",
               },
               {
                 name: "Finals",
@@ -265,10 +262,10 @@ export const eventsByYear = {
                   "Ethical reasoning",
                   "Feasibility of solutions",
                   "Profit-purpose balance",
-                  "Team coordination"
-                ]
-              }
-            ]
+                  "Team coordination",
+                ],
+              },
+            ],
           },
           {
             id: "gordian-knot",
@@ -277,7 +274,8 @@ export const eventsByYear = {
             description:
               "Multi-round competition testing real-world business problem solving.",
             prizes: "₹15,000",
-            image: "/Events/Ranneeti/Ranneeti1.0_Posters/TheGordianKnotPoster.jpg"
+            image:
+              "/Events/Ranneeti/Ranneeti1.0_Posters/TheGordianKnotPoster.jpg",
           },
           {
             id: "ground-reality",
@@ -286,10 +284,28 @@ export const eventsByYear = {
             description:
               "IPL-style live auction simulation testing strategic decision-making.",
             prizes: "₹15,000",
-            image: "/Events/Ranneeti/Ranneeti1.0_Posters/GroundRealityPoster.jpg"
-          }
-        ]
-      }
-    }
-  ]
+            image:
+              "/Events/Ranneeti/Ranneeti1.0_Posters/GroundRealityPoster.jpg",
+          },
+        ],
+      },
+    },
+  ],
 };
+
+/**
+ * Total participant count shown in the hero stats.
+ * Update this number here — the hero updates automatically.
+ */
+export const TOTAL_PARTICIPANTS = 1000;
+
+/** Sorted year strings, newest first. */
+export const getYears = () =>
+  Object.keys(eventsByYear).sort((a, b) => b.localeCompare(a));
+
+
+export const getAllEvents = () =>
+  getYears().flatMap((year) =>
+    eventsByYear[year].map((event) => ({ ...event, year }))
+  );
+

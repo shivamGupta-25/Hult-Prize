@@ -16,37 +16,37 @@ const TeamData = {
 
       departments: {
         Editorial: {
-          heads: [{ name: "Anushka" }, { name: "Sneha" }],
+          heads: [{ name: "Anushka" }],
           seniorMembers: [],
           members: []
         },
 
         Technical: {
-          heads: [{ name: "Vivek" }, { name: "Prince" }],
-          seniorMembers: [{ name: "Yug" }, { name: "Kritika" }],
+          heads: [{ name: "Vivek" }, { name: "Prince" }, { name: "Yug" }],
+          seniorMembers: [],
           members: []
         },
 
         Sponsorship: {
-          heads: [{ name: "Vaibhavi" }, { name: "Khushi" }, { name: "Om" }],
-          seniorMembers: [{ name: "Ravi" }, { name: "Purba" }],
+          heads: [{ name: "Vaibhavi" }, { name: "Khushi" }, { name: "Ravi" }, { name: "Purba" }],
+          seniorMembers: [],
           members: []
         },
 
         EventManagement: {
-          heads: [{ name: "Jannat" }, { name: "Uttkarsh" }],
-          seniorMembers: [{ name: "Aastha" }],
+          heads: [{ name: "Jannat" }, { name: "Asim" }],
+          seniorMembers: [],
           members: []
         },
 
         Marketing: {
-          heads: [{ name: "Tanishka" }, { name: "Rohit" }],
-          seniorMembers: [{ name: "Krishna" }, { name: "Sanjeevni" }],
+          heads: [{ name: "Tanishka" }, { name: "Rohit" }, { name: "Krishna" }, { name: "Sanjeevni" }],
+          seniorMembers: [],
           members: []
         },
 
         Projects: {
-          heads: [{ name: "Aman" }, { name: "Chirag" }, { name: "Bhavya" }],
+          heads: [{ name: "Aman" }, { name: "Bhavya" }],
           seniorMembers: [],
           members: []
         }
