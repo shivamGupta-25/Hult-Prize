@@ -32,7 +32,12 @@ export const getBlogs = cache(async (params = {}) => {
   }
 
   if (search) {
-    matchStage.$text = { $search: String(search) };
+    const searchRegex = { $regex: String(search), $options: 'i' };
+    matchStage.$or = [
+      { title: searchRegex },
+      { excerpt: searchRegex },
+      { author: searchRegex },
+    ];
   }
 
   // Aggregation Pipeline
@@ -51,8 +56,6 @@ export const getBlogs = cache(async (params = {}) => {
       }
     });
     sortStage.calculatedLikeCount = order === 'asc' ? 1 : -1;
-  } else if (search) {
-    sortStage.score = { $meta: 'textScore' };
   } else {
     // Whitelist allowed sort fields to prevent injection
     const allowedSortFields = ['publishedAt', 'title', 'views'];
